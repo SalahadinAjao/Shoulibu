@@ -114,4 +114,11 @@ public class J2CacheTool {
 
         delete(key);
     }
+
+    public static Collection<String> keys(){
+        return cache.keys(SYS_CACHE_NAME);
+    }
+    public static Collection<String> keys(String cacheName){
+        return cache.keys(cacheName);
+    }
 }
