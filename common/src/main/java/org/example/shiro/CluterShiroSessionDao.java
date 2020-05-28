@@ -70,6 +70,7 @@ public class CluterShiroSessionDao extends AbstractSessionDAO {
             }
         }
         return hashSet;
+
     }
 
     /**
