@@ -5,6 +5,62 @@
         http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans-4.2.xsd">
 
+    <!--关于shiro的配置详情https://blog.csdn.net/u012737182/article/details/53147097-->
     <!-- 继承自AuthorizingRealm的自定义Realm,即指定Shiro验证用户登录的类为自定义的UserRealm.java -->
+     <bean id="userRealm" class="org.example.shiro.UserRealm"/>
+     <bean id="CluterShiroSession" class="org.example.shiro.CluterShiroSessionDao"/>
+    <!--定义session管理器-->
+    <bean id="sessionManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
+        <!--设置session过期时间为1小时（毫秒计），默认为30分钟。这里定义的是全局的session会话超时时间，
+        此操作会覆盖web.xml文件中的超时时间配置-->
+        <property name="globalSessionTimeout" value="3600000"></property>
+        <!-- 需要让此session可以使用该定时调度器进行检测 -->
+        <property name="sessionValidationSchedulerEnabled" value="true"></property>
+        <property name="sessionIdUrlRewritingEnabled" value="false"></property>
+        <!-- 定义Session可以进行序列化的工具类 -->
+        <property name="sessionDAO" ref="CluterShiroSession"></property>
+    </bean>
+    <!-- Shiro默认会使用Servlet容器的Session,可通过sessionMode属性来指定使用Shiro原生Session -->
+    <!--即<property name="sessionMode" value="native"/>-->
+    <!-- 这里主要是设置自定义的单Realm应用,若有多个Realm,可使用'realms'属性代替 -->
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <property name="sessionManager" ref="sessionManager"></property>
+        <property name="realm" ref="userRealm"></property>
+    </bean>
+
+    <!-- Shiro主过滤器支持任何基于URL路径表达式的、自定义的过滤器的执行，web应用中
+    ,Shiro可拦截的Web请求必须经过Shiro主过滤器的拦截-->
+    <bean id="ShiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <property name="securityManager" ref="securityManager"/>
+        <!-- 要求登录时的链接(可根据项目的URL进行替换),非必须的属性,默认会自动寻找Web工程根目录
+        下的"/login.html"页面 -->
+        <property name="loginUrl" value="/login.html"/>
+        <!-- 登录成功后要跳转的连接 -->
+        <property name="successUrl" value="/index.html"/>
+        <!-- 用户访问未对其授权的资源时,所显示的连接 -->
+        <property name="unauthorizedUrl" value="/"/>
+        <!-- Shiro连接约束配置,即过滤链的定义 -->
+        <property name="filterChainDefinitions">
+            <value>
+                /statics/**=anon
+                /api/**=anon
+                /api/**=noSessionCreation
+                /login.html=anon
+                /sys/login=anon
+                /captcha.jpg=anon
+                /**=authc
+            </value>
+        </property>
+    </bean>
+    <bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
+
+    <!-- AOP式方法级权限检查  -->
+    <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" depends-on="lifecycleBeanPostProcessor">
+        <property name="proxyTargetClass" value="true" />
+    </bean>
+    <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+        <property name="securityManager" ref="securityManager"/>
+    </bean>
+
 
 </beans>
