@@ -1,5 +1,6 @@
 package org.example.Entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -9,8 +10,9 @@ import java.util.Date;
  * @Version 1.0
  * token实体类，用于封装系统Token数据
  */
-public class TokenEntity {
+public class TokenEntity implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     private Long userId;
     private String token;
     /**token过期时刻*/
