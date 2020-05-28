@@ -1,0 +1,58 @@
+.h2{
+    width: 100%;
+    height: auto;
+    align-content: center;
+}
+
+#space{
+    height: 20px;
+}
+
+#btn{
+    size: A3;
+    font-style: italic;
+    color: #EF3B3A;
+    position: relative;
+    left: 150px;
+}
+.shuruDIv{
+    background-color: #b3b3b3;
+    height: auto;
+    width: 400px;
+    float: right;
+    position: relative;
+    right: 50px;
+    top: 70px;
+}
+.container{
+    width: 100%;
+    background-color: #76b852;
+}
+.zhanshiDiv{
+    margin-left: 200px;
+    margin-top: 200px;
+    position: relative;
+    left: 200px;
+}
+.zhanshiwaibuqiantaoDiv{
+    background-color: #EF3B3A;
+    height: auto;
+    width: 1200px;
+    align-content: center;
+    align-items: center;
+}
+.titleDiv{
+    align-self: center;
+    position: absolute;
+    top: 70px;
+}
+h1{
+    color: #EF3B3A;
+    position: relative;
+    left: 800px;
+    top: 30px;
+}
+
+hr{
+    color: #EF3B3A;
+}

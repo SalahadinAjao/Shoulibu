@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.dao.UserDao">
+    <resultMap id="userMap" type="org.example.entity.UserEntity">
+        <result property="id" column="id"/>
+        <result property="userName" column="user_name"/>
+        <result property="passWord" column="pass_word"/>
+        <result property="teleNumber" column="tele_number"/>
+        <result property="estabTime" column="estab_time"/>
+    </resultMap>
+
+    <update id="update" parameterType="org.example.entity.UserEntity">
+        update userInfo
+        <set>
+            <if test="userName != null">`user_name`=#{userName},</if>
+            <if test="passWord != null">`pass_word`= #{passWord},</if>
+            <if test="teleNumber != null">`tele_number` = #{teleNumber}</if>
+        </set>
+
+        where id = #{id}
+    </update>
+    <select id="queryAll" resultMap="userMap">
+        select * from userInfo
+    </select>
+
+    <insert id="save" parameterType="org.example.entity.UserEntity">
+        insert into userInfo(
+        `user_name`,
+        `pass_word`,
+        `tele_number`,
+        `estab_time`
+        )values (
+        #{userName},
+        #{passWord},
+        #{teleNumber},
+        #{estabTime}
+        )
+    </insert>
+</mapper>

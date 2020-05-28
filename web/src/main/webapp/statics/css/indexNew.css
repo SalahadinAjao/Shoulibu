@@ -1,0 +1,32 @@
+.container{
+    width: 100%;
+    height: 800px;
+    align-items: center;
+    background: burlywood;
+}
+.zhanwei{
+    height: 400px;
+    width: 100%;
+}
+.inputdiv{
+    margin-left: 800px;
+    margin-top: 50px;
+    margin-bottom: 30px;
+}
+
+.passdiv{
+    padding-left: 800px;
+    margin-top: 40px;
+}
+
+.tele{
+    padding-left: 800px;
+    margin-top: 30px;
+}
+.Tijiaobtn{
+    margin-left: 870px;
+    border-style: dot-dash;
+    color: #76b852;
+    size: A3;
+    margin-top: 20px;
+}

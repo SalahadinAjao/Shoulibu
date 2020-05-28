@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<link href="statics/css/test.css" rel="stylesheet" type="text/css"/>
+<script src="statics/libs/jquery-2.1.1/jquery.min.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+    <div class="container">
+        <div class="result">
+        </div>
+        <div id="btnContrainer">
+               <button id="btn">获取全部用户</button>
+               <button id="newBtn">新增</button>
+               <button id="seachBtn">查找</button>
+               <button id="modifyBtn">修改</button>
+        </div>
+    </div>
+
+
+
+   <script>
+       $(document).ready(function () {
+          //点击按钮
+           $("#btn").click(function () {
+
+               $("#btn").hide();
+                $.ajax(
+                    {
+                        url:'http://localhost:8080/web_war_exploded/user/queryAll',
+                        type:"GET",
+                        dataType:"json",
+                        contentType:"application/json",
+
+                        success:function (data) {
+                            console.log(data);
+
+                            var str = "<ul>";
+                           //遍历data
+                            $.each(data,function (i,n) {
+                             str+="<li>"+"ID:"+n.id+"</li>";
+                             str+="<li>"+"用户名："+n.userName+"</li>";
+                             str+="<li>"+"密码 ："+n.passWord+"</li>";
+                             str+="<li>"+"手机："+n.teleNumber+"</li>";
+                            });
+                            str+="</ul>";
+                            $(".result").append(str);
+                        }
+                    }
+                )
+           })
+       })
+   </script>
+</body>
+</html>
