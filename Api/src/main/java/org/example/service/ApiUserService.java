@@ -7,6 +7,7 @@ import org.example.Util.RRException;
 import org.example.dao.ApiUserLevelMapper;
 import org.example.dao.ApiUserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.Map;
  * @email 437547058@qq.com
  * @Version 1.0
  */
+@Service
 public class ApiUserService {
 
     @Autowired
