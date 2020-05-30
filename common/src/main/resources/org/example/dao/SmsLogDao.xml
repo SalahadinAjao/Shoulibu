@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.dao.SysSmsLogDao">
+    <resultMap id="smsLogMap" type="org.example.entity.SysSmsLogEntity">
+        <result property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="mobile" column="mobile"/>
+        <result property="sendtime" column="send_time"/>
+        <result property="templateId" column="templateId"/>
+        <result property="captcheCode" column="captcheCode"/>
+        <result property="userSign" column="user_sign"/>
+        <result property="sendStatus" column="send_status"/>
+        <result property="sendId" column="send_id"/>
+        <result property="successNum" column="success_num"/>
+        <result property="returnMsg" column="return_msg"/>
+        <result property="userName" column="userName"/>
+    </resultMap>
+
+
+</mapper>

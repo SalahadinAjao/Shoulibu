@@ -2,6 +2,7 @@ package org.example.service;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.shiro.util.Assert;
+import org.example.Entity.SmsLogEntity;
 import org.example.Entity.UserEntity;
 import org.example.Util.RRException;
 import org.example.dao.ApiUserLevelMapper;
@@ -89,6 +90,10 @@ public class ApiUserService {
             throw new RRException("手机号或密码错误");
         }
         return userEntity.getUserId();
+    }
+
+    public SmsLogEntity querySmsCodeByUserId(Long userId){
+        return userMapper.querySmsCodeByUserId(userId);
     }
 
 }

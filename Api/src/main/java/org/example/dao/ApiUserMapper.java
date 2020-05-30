@@ -1,6 +1,7 @@
 package org.example.dao;
 
 import org.apache.ibatis.annotations.Param;
+import org.example.Entity.SmsLogEntity;
 import org.example.Entity.UserEntity;
 
 import java.util.List;
@@ -17,6 +18,8 @@ public interface ApiUserMapper extends BaseDao<UserEntity> {
     UserEntity queryByMobile(String mobile);
 
     UserEntity queryByOpenId(@Param("openId") String openId);
+
+    SmsLogEntity querySmsCodeByUserId(Long userId);
 
 
 }
