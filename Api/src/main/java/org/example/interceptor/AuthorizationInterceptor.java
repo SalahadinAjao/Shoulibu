@@ -23,6 +23,7 @@ import java.lang.invoke.MethodHandle;
 /**
  * 权限(Token)验证
  * HandlerInterceptorAdapter拦截所有来自浏览器的请求，使用一个类继承它就可以拦截所有来自浏览器的请求
+ * 这个拦截器被配置为拦截所有诸如“/api/**”这样的路径
  */
 @Component
 public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
