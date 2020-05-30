@@ -3,12 +3,11 @@ package org.example.interceptor;
 import org.apache.commons.lang.StringUtils;
 import org.example.Entity.TokenEntity;
 import org.example.Util.ApiRRException;
-import org.example.annotations.IgnoreAuth;
+import org.example.annotations.SkipAuth;
 import org.example.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
@@ -47,7 +46,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
         response.setHeader("Access-Control-Allow-Headers", "x-requested-with,X-Nideshop-Token,X-URL-PATH");
         response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
 
-        IgnoreAuth ignoreAuth;
+        SkipAuth skipAuth;
         /**
          * springMvc框架中的handler可以是一个自定义的类，也可以是一个controller类的方法，如果是控制器的方法
          * 那么它就是HandlerMethod类型的,如果是这个类型的就代表一个controller方法对象，可以通过它使用反射
@@ -55,7 +54,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
          */
         if (handler instanceof MethodHandle){
             //如果handler是控制器方法，那么就可以使用反射技术获取此方法上的注解
-            ignoreAuth = ((HandlerMethod) handler).getMethodAnnotation(IgnoreAuth.class);
+            skipAuth = ((HandlerMethod) handler).getMethodAnnotation(SkipAuth.class);
             /**这里是不是需要作一个判断：判断annotation对象是否为空？如果为null就需要作相应处理*/
 
             /**--------------------------------存疑-------------------------------------*/
@@ -67,7 +66,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
             return true;
         }
         //如果方法上有ignoreAuth注解，则不需要验证，直接返回ture
-        if (ignoreAuth!=null){
+        if (skipAuth !=null){
             return true;
         }
         //若没有此注解，需要验证

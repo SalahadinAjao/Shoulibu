@@ -10,8 +10,9 @@ import java.lang.annotation.Target;
  * @Date:2020/5/29 上午7:52
  * @email 437547058@qq.com
  * @Version 1.0
+ * 注解，当方法中有此注解时可以不需要权限验证
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface IgnoreAuth {
+public @interface SkipAuth {
 }

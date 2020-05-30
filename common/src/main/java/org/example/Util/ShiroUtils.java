@@ -33,6 +33,17 @@ public class ShiroUtils {
         return getUserEntity().getUserId();
     }
 
+    public static void setSessionAttribute(Object key,Object value){
+        getSession().setAttribute(key,value);
+    }
 
+    public static String getCaptche(String key){
+        //从shiro的session中获取验证码
+        String captche = getSession().getAttribute(key).toString();
+        //从session中清除已获取的验证码
+        getSession().removeAttribute(key);
+
+        return captche;
+    }
 
 }
