@@ -7,6 +7,7 @@ import java.io.Serializable;
  * @Date:2020/5/30 下午5:33
  * @email 437547058@qq.com
  * @Version 1.0
+ * 系统已发送短信日志实体类，内部封装了短信发送日志记录数据
  */
 public class SmsLogEntity implements Serializable {
     public static final long serialVersionUID = 1L;
@@ -19,6 +20,7 @@ public class SmsLogEntity implements Serializable {
 
     private Long log_date;
 
+    //短信的验证码
     private int sms_code;
     // 1成功 0失败
     private Integer send_status;

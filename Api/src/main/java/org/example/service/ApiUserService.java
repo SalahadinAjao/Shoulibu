@@ -96,4 +96,8 @@ public class ApiUserService {
         return userMapper.querySmsCodeByUserId(userId);
     }
 
+    public int saveSmsCodeLog(SmsLogEntity entity){
+        return userMapper.saveSmsCodeLog(entity);
+    }
+
 }

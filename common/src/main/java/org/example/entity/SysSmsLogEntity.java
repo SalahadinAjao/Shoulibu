@@ -18,7 +18,9 @@ public class SysSmsLogEntity implements Serializable {
      */
     private Long userId;
     /**
-     * 必填，手机号码，多个号码以英文逗号隔开
+     * 必填，国际电话号码，格式依据 e.164 标准为：[国家（或地区）码][手机号] ，
+     * 例如8613711112222， 其中86为国家码，13711112222为手机号
+     * 多个号码以英文逗号隔开
      */
     private String mobile;
     /**
@@ -26,7 +28,8 @@ public class SysSmsLogEntity implements Serializable {
      */
     private Date sendtime;
     /**
-     * 模板ID
+     * 模板ID，必须事先在腾讯云申请，通过后填写已审核通过的模板ID
+     * 模板信息可登录腾讯云的短信控制台查看
      */
     private int templateId;
     /**

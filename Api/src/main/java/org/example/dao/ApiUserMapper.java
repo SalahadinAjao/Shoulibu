@@ -21,5 +21,7 @@ public interface ApiUserMapper extends BaseDao<UserEntity> {
 
     SmsLogEntity querySmsCodeByUserId(Long userId);
 
+    int saveSmsCodeLog(SmsLogEntity entity);
+
 
 }
