@@ -30,6 +30,8 @@ import java.io.IOException;
  * @Date:2020/5/30 上午8:09
  * @email 437547058@qq.com
  * @Version 1.0
+ * 这个是系统用户（与普通用户对应，如普通的购物者就是普通用户，而系统用户是卖方）登录
+ * 控制器
  */
 @Controller
 public class SysUserLoginController {
@@ -55,7 +57,7 @@ public class SysUserLoginController {
         //具体的验证码生成逻辑
         String text = producer.createText();
         BufferedImage image = producer.createImage(text);
-        //将文字验证码text保存到session
+        //将验证码text保存到session
         ShiroUtils.setSessionAttribute(Constants.KAPTCHA_SESSION_KEY,text);
 
         //获取输出流
@@ -75,7 +77,7 @@ public class SysUserLoginController {
     @ResponseBody
     @RequestMapping(value = "/sys/login",method = RequestMethod.POST)
     public R login(String userName,String passWord,String captche){
-        //从shiro获取验证码
+        //从shiro获取已存储的验证码
         String captche1 = ShiroUtils.getCaptche(Constants.KAPTCHA_SESSION_KEY);
         if (captche1==null){
             return R.error("登录超时，验证码已失效");

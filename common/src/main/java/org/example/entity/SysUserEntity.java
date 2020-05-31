@@ -9,7 +9,10 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * 这里的这个系统用户与UserEntity的区别是系统用户SysUserEntity代表的是包括UserEntity在内的
+ * 这里的这个系统用户与UserEntity的区别是系统用户SysUserEntity代表的是电商网站的卖家，这类用户可以
+ * 上传产品，可以根据部门权限操作对应的菜单；
+ * 而普通用户则相当于买家，所有人都有固定的角色和权限；
+ *
  * 各个用户分类的描述，定义不同类型用户的权限，能够操作的菜单等
  * @Author: houlintao
  * @Date:2020/5/24 上午11:15
