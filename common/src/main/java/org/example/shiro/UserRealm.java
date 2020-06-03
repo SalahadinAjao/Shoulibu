@@ -35,14 +35,21 @@ public class UserRealm extends AuthorizingRealm {
     private SysUserDao sysUserDao;
 
     //获取授权信息，在权限验证时调用
+    /**
+     *@date: 2020/6/2 下午12:09
+     *@param:
+     *@return:
+     *@Description:获取授权信息，获取当前用户的所有权限并返回
+     */
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
         SysUserEntity user = (SysUserEntity) principalCollection.getPrimaryPrincipal();
         Long userId = user.getUserId();
 
+        //当前用户对应权限列表
         List<String> permsList;
         //如果当前用户是系统管理员，有超级权限
-        if (userId== Constant.SUPER_ADMIN){
+        if (userId == Constant.SUPER_ADMIN){
             List<SysMenuEntity> menuEntities = sysMenuDao.queryList(new HashMap<String, Object>());
             int length = menuEntities.size();
             permsList = new ArrayList<>(length);
@@ -51,7 +58,7 @@ public class UserRealm extends AuthorizingRealm {
             for (SysMenuEntity menu : menuEntities){
                 permsList.add(menu.getPerms());
             }
-        }else {//如果当前用户不是超级管理员则直接通过对应的userdao获取权限
+        }else {//如果当前用户不是超级管理员则直接通过对应的userId获取权限
 
             permsList = sysUserDao.queryALlPerms(userId);
 
@@ -83,7 +90,8 @@ public class UserRealm extends AuthorizingRealm {
      *@date: 2020/5/28 上午7:29
      *@param:SHiro框架内置的Token
      *@return:
-     *@Description:在用户登录时调用的认证函数，封装了我们自定义的登录处理逻辑
+     *@Description:在用户登录时调用的认证函数，封装了我们自定义的登录处理逻辑，获取
+     * 用户认证信息
      */
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
@@ -96,7 +104,7 @@ public class UserRealm extends AuthorizingRealm {
         SysUserEntity userEntity = sysUserDao.queryByName(username);
 
         if (userEntity == null){
-            throw new UnknownAccountException("系统用户不存在，请核对账号");
+            throw new UnknownAccountException("该系统用户不存在，请核对账号");
         }
         //如果用户实体存在，就验证密码
         if (!password.equals(userEntity.getPassword())){

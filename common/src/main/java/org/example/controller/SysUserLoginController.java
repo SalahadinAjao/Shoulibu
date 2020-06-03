@@ -9,8 +9,7 @@ import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.apache.shiro.subject.Subject;
-import org.example.Util.Constant;
-import org.example.Util.R;
+import org.example.Util.ResponseTool;
 import org.example.Util.ShiroUtils;
 import org.example.annotation.SystemLog;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,15 +75,15 @@ public class SysUserLoginController {
     @SystemLog
     @ResponseBody
     @RequestMapping(value = "/sys/login",method = RequestMethod.POST)
-    public R login(String userName,String passWord,String captche){
+    public ResponseTool login(String userName, String passWord, String captche){
         //从shiro获取已存储的验证码
         String captche1 = ShiroUtils.getCaptche(Constants.KAPTCHA_SESSION_KEY);
         if (captche1==null){
-            return R.error("登录超时，验证码已失效");
+            return ResponseTool.error("登录超时，验证码已失效");
         }
         //若验证码不为空，则对比传入的验证码和从shiro中获取的y验证码
         if (!captche1.equalsIgnoreCase(captche)){
-            return R.error("验证码不正确");
+            return ResponseTool.error("验证码不正确");
         }
 
         try {
@@ -96,13 +95,13 @@ public class SysUserLoginController {
             UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken(userName, passWord);
             subject.login(usernamePasswordToken);
         }catch (UnknownAccountException e){
-            return R.error(e.getMessage());
+            return ResponseTool.error(e.getMessage());
         }catch (LockedAccountException e){
-            return R.error(e.getMessage());
+            return ResponseTool.error(e.getMessage());
         }catch (AuthenticationException e){
-            return R.error("账户没有通过验证");
+            return ResponseTool.error("账户没有通过验证");
         }
-        return R.ok();
+        return ResponseTool.ok();
     }
 
     public String logout(){

@@ -1,10 +1,9 @@
 package org.example.controller;
 
-import org.example.Util.R;
+import org.example.Util.ResponseTool;
 import org.example.service.ApiUserService;
 import org.example.validator.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,12 +28,12 @@ public class ApiRegisterController {
      *@Description:用户注册方法
      */
     @RequestMapping("register")
-    public R register(String mobile,String password){
+    public ResponseTool register(String mobile, String password){
         Assert.isBlank(mobile,"手机号不能为空");
         Assert.isBlank(password,"密码不能为空");
 
         userService.save(mobile,password);
 
-        return R.ok();
+        return ResponseTool.ok();
     }
 }

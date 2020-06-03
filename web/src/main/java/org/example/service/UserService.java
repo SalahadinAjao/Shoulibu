@@ -1,6 +1,6 @@
 package org.example.service;
 
-import org.example.Util.R;
+import org.example.Util.ResponseTool;
 import org.example.entity.UserEntity;
 
 import java.util.List;
@@ -18,5 +18,5 @@ public interface UserService {
     //全部
     List<UserEntity> queryAll();
 
-    R update(UserEntity entity);
+    ResponseTool update(UserEntity entity);
 }

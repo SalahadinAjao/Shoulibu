@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.crypto.hash.Sha256Hash;
@@ -8,10 +9,10 @@ import org.example.entity.SysUserEntity;
 import org.example.service.SysUserRoleService;
 import org.example.service.SysUserService;
 import org.example.validator.Assert;
+import org.example.validator.ValidatorUtils;
+import org.example.validator.group.AddGroup;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import java.util.Map;
  * @Date:2020/6/1 下午2:38
  * @email 437547058@qq.com
  * @Version 1.0
+ * 系统用户控制器类，负责允许管理员管理这个系统中的用户，对用户进行增删查改操作
  */
 
 @RestController
@@ -34,7 +36,7 @@ public class SysUserController extends AbstractController {
 
     @RequestMapping("/list")
     @RequiresPermissions("sys:user:list")
-    public R List(@RequestParam Map<String,Object> map){
+    public ResponseTool List(@RequestParam Map<String,Object> map){
         if (getUserId() != Constant.SUPER_ADMIN){
             map.put("createUserId",getUserId());
         }
@@ -44,15 +46,15 @@ public class SysUserController extends AbstractController {
 
         PageTool pageTool = new PageTool(entityList, total, query.getLimit(), query.getPage());
 
-       return R.ok().put("page",pageTool);
+       return ResponseTool.ok().put("page",pageTool);
     }
 
     /**
      * 获取当前登录的用户信息
      */
     @RequestMapping("/info")
-    public R info() {
-        return R.ok().put("user", getUser());
+    public ResponseTool info() {
+        return ResponseTool.ok().put("user", getUser());
     }
     /**
      *@date: 2020/6/1 下午6:19
@@ -61,7 +63,7 @@ public class SysUserController extends AbstractController {
      *@return:
      *@Description:修改密码
      */
-    public R updatePassword(String oldPass,String newPass){
+    public ResponseTool updatePassword(String oldPass, String newPass){
        if (ResourceTool.getConfigPropertyByName("sys.demo").equals("1")){
            throw new RRException("演示环境，无法修改密码");
        }
@@ -72,10 +74,64 @@ public class SysUserController extends AbstractController {
 
         int password = userService.updatePassword(getUserId(), oldPass, newPass);
         if (password==0){
-            return R.error("原密码错误");
+            return ResponseTool.error("原密码错误");
         }
         SecurityUtils.getSubject().logout();
-        return R.ok();
+        return ResponseTool.ok();
+    }
+
+    /**
+     * 根据此用户id获取对应的用户实体信息，包括此用户相关的角色信息
+     */
+    @RequestMapping("/info/{userId}")
+    @RequiresPermissions("sys:user:info")
+    public ResponseTool userInfo(@PathVariable("userId") Long userId){
+        SysUserEntity userEntity = userService.queryObject(userId);
+        //获取与此用户相关的角色id列表
+        List<Long> roleIdList = userRoleService.queryRoleIdList(userId);
+
+        userEntity.setRoleIdList(roleIdList);
+        return ResponseTool.ok().put("user",userEntity);
+    }
+
+
+    @RequestMapping("/save")
+    @RequiresPermissions("sys:user:save")
+    public ResponseTool saveUser(@RequestBody SysUserEntity userEntity){
+        ValidatorUtils.validateEntity(userEntity, AddGroup.class);
+        userEntity.setCreateUserId(getUserId());
+        userService.save(userEntity);
+
+        return ResponseTool.ok();
+    }
+
+    /**
+     *@date: 2020/6/3 下午4:33
+     *@param:
+     *@return:
+     *@Description:更新用户信息
+     */
+    @RequestMapping("/update")
+    @RequiresPermissions("sys:user:update")
+    public ResponseTool updateUser(@RequestBody SysUserEntity userEntity){
+        //同save方法一样，更新用户信息的第一步是校验数据
+        Map<String, StringBuilder> validateEntity = ValidatorUtils.validateEntity(userEntity);
+        userEntity.setCreateUserId(getUserId());
+        userService.update(userEntity);
+
+        return ResponseTool.ok();
+    }
+
+    @RequestMapping("/delete")
+    @RequiresPermissions("sys:user:delete")
+    public ResponseTool deleteUser(@RequestBody Long[] userIds){
+        //判断系统用户级别，系统管理员无法删除
+        if (ArrayUtils.contains(userIds,1L)){
+            return ResponseTool.error("系统管理员，无法删除");
+        }
+        userService.deleteBatch(userIds);
+
+        return ResponseTool.ok();
     }
 
 }

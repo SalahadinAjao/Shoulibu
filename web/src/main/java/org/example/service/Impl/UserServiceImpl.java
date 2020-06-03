@@ -1,6 +1,6 @@
 package org.example.service.Impl;
 
-import org.example.Util.R;
+import org.example.Util.ResponseTool;
 import org.example.dao.UserDao;
 import org.example.entity.UserEntity;
 import org.example.service.UserService;
@@ -32,8 +32,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public R update(UserEntity entity) {
+    public ResponseTool update(UserEntity entity) {
         userDao.update(entity);
-        return R.ok();
+        return ResponseTool.ok();
     }
 }

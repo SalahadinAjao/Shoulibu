@@ -9,6 +9,7 @@ import java.io.Serializable;
  * @Version 1.0
  */
 public class SysMenuEntity extends Tree {
+
       private Long menuId;
       //父菜单id，一级菜单为0
       private Long parentId;
@@ -20,8 +21,8 @@ public class SysMenuEntity extends Tree {
      */
     private String url;
     /**
-     * 授权(多个用逗号分隔，如：user:list,user:create)，只有有相关授权的用户才能操作
-     * 对应的菜单
+     * 菜单授权(多个用逗号分隔，如：user:list,user:create)，
+     * 只有有相关授权的用户才能操作对应的菜单
      */
     private String perms;
 

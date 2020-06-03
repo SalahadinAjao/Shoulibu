@@ -2,6 +2,7 @@ package org.example.entity;
 
 import org.example.validator.group.AddGroup;
 import org.example.validator.group.UpdateGroup;
+import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
 
 import java.io.Serializable;
@@ -25,11 +26,17 @@ public class SysUserEntity implements Serializable {
     //用户id
     private Long userId;
     //用户名
+    /**
+     * 这里使用了group对实体的属性进行组约束
+     */
     @NotBlank(message = "用户名不能为空",groups = {AddGroup.class, UpdateGroup.class})
     private String userName;
 
     //密码，不需要进行序列化，故在这里用transient修饰
     private transient String password;
+    @NotBlank(message = "邮箱不能为空", groups = {AddGroup.class, UpdateGroup.class})
+    @Email(message = "邮箱格式不正确", groups = {AddGroup.class, UpdateGroup.class})
+    private String email;
 
     //手机号码
     private String mobile;

@@ -1,6 +1,6 @@
 package org.example.controller;
 
-import org.example.Util.R;
+import org.example.Util.ResponseTool;
 import org.example.entity.UserEntity;
 import org.example.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -28,9 +27,9 @@ public class UserController {
 
     @RequestMapping("/update")
     @ResponseBody
-    public R update(UserEntity entity){
+    public ResponseTool update(UserEntity entity){
         userService.update(entity);
-        return R.ok();
+        return ResponseTool.ok();
     }
 
 
@@ -44,14 +43,14 @@ public class UserController {
     }
 
     @RequestMapping(value = "/save",method = RequestMethod.POST)
-    public R save(@RequestBody UserEntity entity){
+    public ResponseTool save(@RequestBody UserEntity entity){
         Date date = new Date();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String estabTime = format.format(date.getTime());
         entity.setEstabTime(estabTime);
         System.out.println("前端json数据 entity = " + entity.toString());
         userService.save(entity);
-        return R.ok();
+        return ResponseTool.ok();
     }
 
 

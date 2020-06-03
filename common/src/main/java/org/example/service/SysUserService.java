@@ -30,4 +30,12 @@ public interface SysUserService {
      *@Description:修改密码
      */
     int updatePassword(Long userId, String oldPass, String newPass);
+    //通过用户id查询用户实体
+    SysUserEntity queryObject(Long userId);
+
+    void save(SysUserEntity user);
+
+    void update(SysUserEntity user);
+
+    void deleteBatch(Long[] userIds);
 }
