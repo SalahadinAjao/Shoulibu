@@ -8,6 +8,8 @@ import java.util.List;
  * @Date:2020/5/24 下午12:14
  * @email 437547058@qq.com
  * @Version 1.0
+ * 树型控件的使用是应用开发必不可少的，  zTree 是一个依靠 jQuery 实现的多功能 “树插件”
+ * 这个Tree类就是一个ztree的工具
  */
 public class Tree<T> implements Serializable {
     private static final long serialVersionUID = 1L;
