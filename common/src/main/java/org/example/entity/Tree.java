@@ -21,7 +21,7 @@ public class Tree<T> implements Serializable {
     private boolean disabled = false;
 
     /**
-     * 禁掉 checkbox
+     * 是否禁掉 checkbox
      */
     private boolean disableCheckbox = false;
     /**

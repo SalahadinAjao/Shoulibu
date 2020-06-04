@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.dao.SysRoleDeptDao">
+    <insert id="save">
+        insert into sys_role_dept(
+        `role_id`,
+        `dept_id`
+        )
+        values
+        <!--
+        Map<String, Object> map = new HashMap<>();
+        map.put("roleId", roleId);
+        map.put("deptIdList", deptIdList);
+        roleDeptDao.save(map);
+        save()传入的是一个map，此map中封装了一个roleId和一个List数据类型deptIdList
+        下面的<foreach>就是遍历deptIdList将其内部元素赋值给dept_id
+        也就是说<foreach>中的collection指向的就是deptIdList这个List
+        -->
+        <foreach collection="deptIdList" item="item" index="index" separator=",">
+            (
+            #{roleId},
+            #{item}
+            )
+        </foreach>
+    </insert>
+
+    <delete id="delete">
+        delete from sys_role_dept where role_id = #{value}
+    </delete>
+
+    <select id="queryDeptIdList" resultType="long">
+        select dept_id from sys_role_dept where role_id = #{value }
+    </select>
+
+    <select id="queryDeptIdListByUserId" resultType="long">
+		select dept_id from sys_role_dept where role_id IN (SELECT role_id FROM SYS_USER_ROLE WHERE user_id =  #{value})
+	</select>
+</mapper>

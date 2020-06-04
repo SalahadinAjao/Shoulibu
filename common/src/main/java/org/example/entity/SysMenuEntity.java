@@ -16,10 +16,10 @@ public class SysMenuEntity extends Tree {
       private String parentName;
       //菜单名称
       private String name;
-    /**
-     * 菜单URL
-     */
-    private String url;
+      /**
+        * 菜单URL
+        */
+      private String url;
     /**
      * 菜单授权(多个用逗号分隔，如：user:list,user:create)，
      * 只有有相关授权的用户才能操作对应的菜单

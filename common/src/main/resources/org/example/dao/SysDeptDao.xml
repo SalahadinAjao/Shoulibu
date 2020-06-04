@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.dao.SysDeptDao">
+    <select id="queryObject" resultType="org.example.entity.SysDeptEntity">
+        select * from sys_dept where dept_id = #{value} and del_flag =0
+    </select>
+
+    <select id="queryList" resultType="org.example.entity.SysDeptEntity">
+        select d.*,(select p.name from sys_dept p where p.dept_id = d.parent_id) as parentName
+        from sys_dept d where d.del_flag = 0
+        <if test="deptFilter != null">
+            and d.dept_id in (${deptFilter})
+        </if>
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by d.${sidx} ${order}
+            </when>
+            <otherwise>
+                order by d.order_num asc
+            </otherwise>
+        </choose>
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+
+
+</mapper>

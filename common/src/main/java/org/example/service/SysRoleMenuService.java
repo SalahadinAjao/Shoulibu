@@ -15,8 +15,6 @@ public interface SysRoleMenuService {
      *@date: 2020/6/3 下午5:10
      *@param roleId 用户角色id
      *@param menuIdList roleId对应的菜单id列表
-     *@return:
-     *@Description:
      */
     void saveOrUpdate(Long roleId, List<Long> menuIdList);
 
