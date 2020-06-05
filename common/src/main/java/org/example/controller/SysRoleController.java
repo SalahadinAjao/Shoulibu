@@ -4,7 +4,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.example.Util.Constant;
 import org.example.Util.PageTool;
 import org.example.Util.Query;
-import org.example.Util.ResponseTool;
+import org.example.Util.ResponseMap;
 import org.example.entity.SysRoleEntity;
 import org.example.service.SysRoleDeptService;
 import org.example.service.SysRoleMenuService;
@@ -46,7 +46,7 @@ public class SysRoleController extends AbstractController {
      */
     @RequestMapping("/list")
     @RequiresPermissions("sys:role:list")
-    public ResponseTool roleList(@RequestParam Map<String,Object> map){
+    public ResponseMap roleList(@RequestParam Map<String,Object> map){
         //判断是否为超级管理员
         if (getUserId() != Constant.SUPER_ADMIN){
             //不是超级管理员，则只能查看由自己创建的角色，这里在查询的时候为普通用户添加
@@ -60,13 +60,13 @@ public class SysRoleController extends AbstractController {
 
         PageTool pageTool = new PageTool(sysRoleEntities, total, query.getLimit(), query.getPage());
 
-        return ResponseTool.ok().put("page",pageTool);
+        return ResponseMap.ok().put("page",pageTool);
     }
 
 
     @RequestMapping("/select")
     @RequiresPermissions("sys:role:select")
-    public ResponseTool selectRole(){
+    public ResponseMap selectRole(){
         HashMap<String, Object> map = new HashMap<>();
         if (getUserId() != Constant.SUPER_ADMIN){
             map.put("createUserId",getUserId());
@@ -74,12 +74,12 @@ public class SysRoleController extends AbstractController {
 
         List<SysRoleEntity> entityList = roleService.queryList(map);
 
-        return ResponseTool.ok().put("list",entityList);
+        return ResponseMap.ok().put("list",entityList);
     }
 
     @RequestMapping("/info")
     @RequiresPermissions("sys:role:info")
-    public ResponseTool roleInfo(Long roleId){
+    public ResponseMap roleInfo(Long roleId){
         SysRoleEntity roleEntity = roleService.queryObject(roleId);
 
         List<Long> menuIdList = roleMenuService.queryMenuIdList(roleId);
@@ -89,39 +89,39 @@ public class SysRoleController extends AbstractController {
         roleEntity.setDeptIdList(deptIdList);
         roleEntity.setMenuIdList(menuIdList);
 
-        return ResponseTool.ok().put("role",roleEntity);
+        return ResponseMap.ok().put("role",roleEntity);
     }
 
     @RequestMapping("/save")
     @RequiresPermissions("sys:role:save")
-    public  ResponseTool saveRole(@RequestBody SysRoleEntity roleEntity){
+    public ResponseMap saveRole(@RequestBody SysRoleEntity roleEntity){
         //校验实体数据，在任何实体数据保存进数据库前尽量校验一下
         ValidatorUtils.validateEntity(roleEntity);
         roleEntity.setCreatorId(getUserId());
 
         roleService.save(roleEntity);
 
-        return ResponseTool.ok();
+        return ResponseMap.ok();
     }
 
     @RequestMapping("/update")
     @RequiresPermissions("sys:role:update")
-    public ResponseTool updateRole(@RequestBody SysRoleEntity roleEntity){
+    public ResponseMap updateRole(@RequestBody SysRoleEntity roleEntity){
         //第一条：还是校验数据
         ValidatorUtils.validateEntity(roleEntity);
 
         roleEntity.setCreatorId(getUserId());
         roleService.update(roleEntity);
 
-        return ResponseTool.ok();
+        return ResponseMap.ok();
     }
 
     @RequestMapping("/delete")
     @RequiresPermissions("sys:role:update")
-    public ResponseTool deleteRole(@RequestBody Long[] roleIds){
+    public ResponseMap deleteRole(@RequestBody Long[] roleIds){
         roleService.deleteBatch(roleIds);
 
-        return ResponseTool.ok();
+        return ResponseMap.ok();
     }
 
 }

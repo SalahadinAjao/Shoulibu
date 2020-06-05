@@ -1,6 +1,6 @@
 package org.example.controller;
 
-import org.example.Util.ResponseTool;
+import org.example.Util.ResponseMap;
 import org.example.service.ApiUserService;
 import org.example.validator.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,12 +28,12 @@ public class ApiRegisterController {
      *@Description:用户注册方法
      */
     @RequestMapping("register")
-    public ResponseTool register(String mobile, String password){
+    public ResponseMap register(String mobile, String password){
         Assert.isBlank(mobile,"手机号不能为空");
         Assert.isBlank(password,"密码不能为空");
 
         userService.save(mobile,password);
 
-        return ResponseTool.ok();
+        return ResponseMap.ok();
     }
 }

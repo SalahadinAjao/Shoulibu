@@ -8,7 +8,8 @@ import java.util.HashMap;
  * @email 437547058@qq.com
  * @Version 1.0
  */
-public class ResponseTool extends HashMap<String,Object> {
+public class ResponseMap
+        extends HashMap<String,Object> {
     private static final long serialVersionUID = 1L;
 
 
@@ -18,7 +19,7 @@ public class ResponseTool extends HashMap<String,Object> {
      *@return:
      *@Description:
      */
-    public ResponseTool(){
+    public ResponseMap(){
         put("code",0);
     }
 
@@ -28,23 +29,23 @@ public class ResponseTool extends HashMap<String,Object> {
      *@return:
      *@Description:
      */
-    public static ResponseTool erro(int code, String msg){
-        ResponseTool r = new ResponseTool();
+    public static ResponseMap erro(int code, String msg){
+        ResponseMap r = new ResponseMap();
         r.put("code",code);
         r.put("msg",msg);
         return r;
     }
 
-    public static ResponseTool error(String msg) {
+    public static ResponseMap error(String msg) {
         return erro(500,msg);
     }
 
-    public static ResponseTool error(){
+    public static ResponseMap error(){
         return erro(500,"未知异常");
     }
 
-    public static ResponseTool ok(String msg) {
-        ResponseTool r = new ResponseTool();
+    public static ResponseMap ok(String msg) {
+        ResponseMap r = new ResponseMap();
         r.put("msg", msg);
         return r;
     }
@@ -55,18 +56,18 @@ public class ResponseTool extends HashMap<String,Object> {
      *@return:
      *@Description:
      */
-    public static ResponseTool ok(HashMap<String,Object> map){
-        ResponseTool r = new ResponseTool();
+    public static ResponseMap ok(HashMap<String,Object> map){
+        ResponseMap r = new ResponseMap();
         r.putAll(map);
         return r;
     }
 
-    public static ResponseTool ok(){
-        return new ResponseTool();
+    public static ResponseMap ok(){
+        return new ResponseMap();
     }
 
 
-    public ResponseTool put(String key, Object value) {
+    public ResponseMap put(String key, Object value) {
         super.put(key, value);
         return this;
     }

@@ -36,7 +36,7 @@ public class SysUserController extends AbstractController {
 
     @RequestMapping("/list")
     @RequiresPermissions("sys:user:list")
-    public ResponseTool List(@RequestParam Map<String,Object> map){
+    public ResponseMap List(@RequestParam Map<String,Object> map){
         if (getUserId() != Constant.SUPER_ADMIN){
             map.put("createUserId",getUserId());
         }
@@ -46,15 +46,15 @@ public class SysUserController extends AbstractController {
 
         PageTool pageTool = new PageTool(entityList, total, query.getLimit(), query.getPage());
 
-       return ResponseTool.ok().put("page",pageTool);
+       return ResponseMap.ok().put("page",pageTool);
     }
 
     /**
      * 获取当前登录的用户信息
      */
     @RequestMapping("/info")
-    public ResponseTool info() {
-        return ResponseTool.ok().put("user", getUser());
+    public ResponseMap info() {
+        return ResponseMap.ok().put("user", getUser());
     }
     /**
      *@date: 2020/6/1 下午6:19
@@ -63,7 +63,7 @@ public class SysUserController extends AbstractController {
      *@return:
      *@Description:修改密码
      */
-    public ResponseTool updatePassword(String oldPass, String newPass){
+    public ResponseMap updatePassword(String oldPass, String newPass){
        if (ResourceTool.getConfigPropertyByName("sys.demo").equals("1")){
            throw new RRException("演示环境，无法修改密码");
        }
@@ -74,10 +74,10 @@ public class SysUserController extends AbstractController {
 
         int password = userService.updatePassword(getUserId(), oldPass, newPass);
         if (password==0){
-            return ResponseTool.error("原密码错误");
+            return ResponseMap.error("原密码错误");
         }
         SecurityUtils.getSubject().logout();
-        return ResponseTool.ok();
+        return ResponseMap.ok();
     }
 
     /**
@@ -85,24 +85,24 @@ public class SysUserController extends AbstractController {
      */
     @RequestMapping("/info/{userId}")
     @RequiresPermissions("sys:user:info")
-    public ResponseTool userInfo(@PathVariable("userId") Long userId){
+    public ResponseMap userInfo(@PathVariable("userId") Long userId){
         SysUserEntity userEntity = userService.queryObject(userId);
         //获取与此用户相关的角色id列表
         List<Long> roleIdList = userRoleService.queryRoleIdList(userId);
 
         userEntity.setRoleIdList(roleIdList);
-        return ResponseTool.ok().put("user",userEntity);
+        return ResponseMap.ok().put("user",userEntity);
     }
 
 
     @RequestMapping("/save")
     @RequiresPermissions("sys:user:save")
-    public ResponseTool saveUser(@RequestBody SysUserEntity userEntity){
+    public ResponseMap saveUser(@RequestBody SysUserEntity userEntity){
         ValidatorUtils.validateEntity(userEntity, AddGroup.class);
         userEntity.setCreateUserId(getUserId());
         userService.save(userEntity);
 
-        return ResponseTool.ok();
+        return ResponseMap.ok();
     }
 
     /**
@@ -113,25 +113,25 @@ public class SysUserController extends AbstractController {
      */
     @RequestMapping("/update")
     @RequiresPermissions("sys:user:update")
-    public ResponseTool updateUser(@RequestBody SysUserEntity userEntity){
+    public ResponseMap updateUser(@RequestBody SysUserEntity userEntity){
         //同save方法一样，更新用户信息的第一步是校验数据
         Map<String, StringBuilder> validateEntity = ValidatorUtils.validateEntity(userEntity);
         userEntity.setCreateUserId(getUserId());
         userService.update(userEntity);
 
-        return ResponseTool.ok();
+        return ResponseMap.ok();
     }
 
     @RequestMapping("/delete")
     @RequiresPermissions("sys:user:delete")
-    public ResponseTool deleteUser(@RequestBody Long[] userIds){
+    public ResponseMap deleteUser(@RequestBody Long[] userIds){
         //判断系统用户级别，系统管理员无法删除
         if (ArrayUtils.contains(userIds,1L)){
-            return ResponseTool.error("系统管理员，无法删除");
+            return ResponseMap.error("系统管理员，无法删除");
         }
         userService.deleteBatch(userIds);
 
-        return ResponseTool.ok();
+        return ResponseMap.ok();
     }
 
 }

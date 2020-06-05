@@ -2,17 +2,20 @@ package org.example.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.qiniu.util.StringUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.log4j.Logger;
 import org.example.Entity.AllUserInfo;
 import org.example.Entity.BaseUserInfo;
 import org.example.Entity.UserEntity;
 import org.example.Util.CharUtil;
 import org.example.Util.CommonTool;
+import org.example.Util.ResponseMap;
 import org.example.annotations.SkipAuth;
 import org.example.service.ApiUserService;
 import org.example.service.TokenService;
 import org.example.utils.ApiBaseAction;
 import org.example.utils.UserWeiXinTools;
+import org.example.validator.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +26,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @Author: houlintao
@@ -40,6 +44,23 @@ public class AuthController extends ApiBaseAction {
     private TokenService tokenService;
 
     @SkipAuth
+    @RequestMapping("/login")
+    public ResponseMap login(String mobile, String password){
+        Assert.isBlank(mobile,"手机号不能为空");
+        Assert.isBlank(password,"密码不能为空");
+
+        long userId = userService.login(mobile, password);
+
+        Map<String, Object> tokenMap = tokenService.creatToken(userId);
+
+        return ResponseMap.ok((HashMap<String, Object>) tokenMap);
+    }
+
+
+    /**
+     * 微信登录
+     */
+    @SkipAuth
     @RequestMapping("login_by_weixin")
     public Object loginByWeiXin() throws IOException, NoSuchAlgorithmException, NoSuchProviderException, KeyManagementException {
         //获取Json请求对象
@@ -47,7 +68,7 @@ public class AuthController extends ApiBaseAction {
         AllUserInfo allUserInfo = null;
         /**
          * 调用微信登录的第一步是通过微信开放接口wx.login获取由微信
-         * 平台提供的临时登录凭证，这个凭证是临时的，每次登录都会生成一个
+         * 平台提供的临时登录凭证，这个凭证是临时的;
          * 然后前端会把这个临时凭证发送给开发者服务器；
          * 这里的code就是保存的由前端发送的临时凭证；
          */
@@ -74,7 +95,7 @@ public class AuthController extends ApiBaseAction {
         String webAccessUrl = UserWeiXinTools.getWebAccess(code);
         //使用https请求微信相关服务器地址以获取由微信返回的session数据
         JSONObject sessionData = CommonTool.sendHttpsRequest(webAccessUrl, "GET", null);
-        if (sessionData==null || StringUtils.isNullOrEmpty(sessionData.getString("openid")))){
+        if (sessionData==null || StringUtils.isNullOrEmpty(sessionData.getString("openid"))){
           return toResponsFail("登录失败");
         }
         //若sessionData！= null
@@ -104,6 +125,19 @@ public class AuthController extends ApiBaseAction {
 
             userService.update(userEntity);
         }
+
+        Map<String, Object> tokenMap = tokenService.creatToken(userEntity.getUserId());
+        String token = MapUtils.getString(tokenMap, "token");
+        if (baseUserInfo == null || StringUtils.isNullOrEmpty(token)){
+            return toResponsFail("登录失败");
+        }
+
+        resultMap.put("token",token);
+        resultMap.put("userInfo",baseUserInfo);
+        resultMap.put("userId",userEntity.getUserId());
+
+        return toResponseSuccess(resultMap);
+
     }
 
 }

@@ -73,6 +73,11 @@ public class TokenService {
         hashMap.put("token",tokenEntity);
         hashMap.put("finalTime",FINALTIME);
 
+        /**
+         * 这里返回的是一个map,其中的token对象通过键token即可获取到
+         * 因此如果要想获取到token对象就需要调用MapUtil的getString方法
+         * 获取对应token;
+         */
         return hashMap;
     }
 
