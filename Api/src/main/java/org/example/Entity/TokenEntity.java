@@ -6,13 +6,12 @@ import java.util.Date;
 /**
  * @Author: houlintao
  * @Date:2020/5/29 上午6:45
- * @email 437547058@qq.com
- * @Version 1.0
  * token实体类，用于封装系统Token数据
  */
 public class TokenEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    //通过userId与用户绑定
     private Long userId;
     private String token;
     /**token过期时刻*/
