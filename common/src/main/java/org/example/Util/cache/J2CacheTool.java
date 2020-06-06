@@ -20,6 +20,10 @@ public class J2CacheTool {
     private static CacheChannel cache = J2Cache.getChannel();
 
 
+    /**
+     * 商城业务缓存
+     */
+    public static String SHOP_CACHE_NAME = "shopCache";
     //系统缓存flag
     private static String SYS_CACHE_NAME = "sysCache";
 
@@ -42,6 +46,16 @@ public class J2CacheTool {
      */
     public static Object get(String key){
         return getCache(SYS_CACHE_NAME,key);
+    }
+    /**
+     * 获取缓存
+     *
+     * @param cacheName
+     * @param key
+     * @return
+     */
+    public static Object get(String cacheName, String key) {
+        return cache.get(cacheName, key).getValue();
     }
     /**
      *@date: 2020/5/28 上午8:40

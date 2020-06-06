@@ -30,7 +30,7 @@ public class SysUserServiceimpl implements SysUserService {
 
     @Override
     public int queryTotal(Map<String, Object> map) {
-        return userDao.queryTOtal(map);
+        return userDao.queryTotal(map);
     }
 
     @Override

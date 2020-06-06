@@ -10,7 +10,7 @@ import java.util.Map;
  * @Date:2020/5/31 下午5:09
  * @email 437547058@qq.com
  * @Version 1.0
- * 订单实体类
+ * 订单实体类，订单包含了商品总价格和运费等费用
  */
 public class OrderEntity implements Serializable {
 
@@ -47,7 +47,7 @@ public class OrderEntity implements Serializable {
     private String address;
     //联系电话
     private String mobile;
-    //补充说明
+    //补充说明，留言
     private String postscript;
     //快递公司Id
     private Integer shipping_id;

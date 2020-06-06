@@ -26,7 +26,7 @@ public class SysDeptServiceImpl implements SysDeptService {
 
     @Override
     public SysDeptEntity queryObject(Long deptId) {
-        return deptDao.queryOBject(deptId);
+        return deptDao.queryObject(deptId);
     }
 
     @Override

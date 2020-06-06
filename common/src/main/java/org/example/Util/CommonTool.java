@@ -15,6 +15,8 @@ import java.security.KeyManagementException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * @Author: houlintao
@@ -105,5 +107,13 @@ public class CommonTool {
             // TODO: handle exception
             return null;
         }
+    }
+
+    //生成订单序列号
+    public static String createOrderSn(){
+        Calendar instance = Calendar.getInstance();
+        instance.setTime(new Date());
+        String timeStr = DateTool.format(instance.getTime(), DateTool.DATE_TIME_PATTERN_YYYY_MM_DD_HH_MM_SS_SSS);
+        return timeStr+CharUtil.getRandomNum(6);
     }
 }

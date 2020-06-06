@@ -29,7 +29,7 @@ public class ApiUserService {
     private ApiUserLevelMapper userLevelMapper;
 
     public UserEntity queryObject(Long userId){
-        return userMapper.queryOBject(userId);
+        return userMapper.queryObject(userId);
     }
 
     public UserEntity queryByOPenId(String openId){
@@ -41,7 +41,7 @@ public class ApiUserService {
     }
 
     public int queryTotal(Map<String,Object> map){
-        return userMapper.queryTOtal(map);
+        return userMapper.queryTotal(map);
     }
 
     public void save(String mobile,String password){
