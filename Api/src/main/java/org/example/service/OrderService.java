@@ -88,15 +88,19 @@ public class OrderService {
          * 当前端选择加入购物车再购买时此type = cart
          */
         String type = jsonParam.getString("type");
+        //额外信息，如用户留言
         String postscript = jsonParam.getString("postscript");
         //获取用户地址
         AddressEntity addressEntity = addressMapper.queryObject(jsonParam.getInteger("addressId"));
         //运费
         Integer freightPrice = 0;
-
+        //选中的商品列表
         List<CartEntity> checkedGoodsList = new ArrayList<>();
+        //商品总价
         BigDecimal goodsTotalPrice= null;
-
+        /**
+         * 如果是从购物车提交的就需要为其分配一个购物车了
+         */
         if (type.equals("cart")){
             HashMap<String, Object> cartMap = new HashMap<>();
 
@@ -125,14 +129,14 @@ public class OrderService {
             for (CartEntity cartEntity:checkedGoodsList){
                 goodsTotalPrice = goodsTotalPrice.add(cartEntity.getRetail_price().multiply(new BigDecimal(cartEntity.getNumber())));
             }
-        }else {//直接购买商品
+        }else {//直接购买商品，也需分配购物车
             //buyGoodsEntity表示我们购买的商品
             BuyGoodsEntity buyGoodsEntity = (BuyGoodsEntity) J2CacheTool.get(J2CacheTool.SHOP_CACHE_NAME, "goods" + userEntity.getUserId());
             //通过我们所购买的产品buyGoodsEntity获取到产品id,进而获取到对应的productEntity
             ProductEntity productEntity = productService.queryObject(buyGoodsEntity.getProductId());
             //计算商品总价商品总价=商品零售价*数量，这里用的是BigDEcimal
             goodsTotalPrice = productEntity.getRetail_price().multiply(new BigDecimal(buyGoodsEntity.getName()));
-
+            //分配购物车
             CartEntity cartEntity = new CartEntity();
             /**
              * 由于在这个上下文语境下 cartEntity包含很多productEntity的属性，因此
