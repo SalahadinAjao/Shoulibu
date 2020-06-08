@@ -1,6 +1,6 @@
 package org.example.service;
 
-import org.example.Entity.ProductEntity;
+import org.example.entity.ProductEntity;
 import org.example.dao.ProductMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

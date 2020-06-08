@@ -1,7 +1,7 @@
 package org.example.service;
 
 import com.alibaba.fastjson.JSONObject;
-import org.example.Entity.*;
+import org.example.entity.*;
 import org.example.Util.CommonTool;
 import org.example.Util.cache.J2CacheTool;
 import org.example.dao.*;
@@ -57,8 +57,8 @@ public class OrderService {
         orderMapper.save(entity);
     }
 
-    public void updateOrder(OrderEntity entity){
-        orderMapper.update(entity);
+    public int updateOrder(OrderEntity entity){
+        return orderMapper.update(entity);
     }
 
     public void deleteOrder(Integer id){

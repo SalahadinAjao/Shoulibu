@@ -1,7 +1,6 @@
 package org.example.service;
 
-import org.apache.commons.lang.CharUtils;
-import org.example.Entity.TokenEntity;
+import org.example.entity.TokenEntity;
 import org.example.Util.CharUtil;
 import org.example.dao.TokenMapper;
 import org.springframework.beans.factory.annotation.Autowired;

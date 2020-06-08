@@ -1,4 +1,4 @@
-package org.example.Entity;
+package org.example.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 

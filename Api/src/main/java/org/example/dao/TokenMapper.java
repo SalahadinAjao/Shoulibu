@@ -1,7 +1,7 @@
 package org.example.dao;
 
 import org.apache.ibatis.annotations.Param;
-import org.example.Entity.TokenEntity;
+import org.example.entity.TokenEntity;
 
 /**
  * @Author: houlintao

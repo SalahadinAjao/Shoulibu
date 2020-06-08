@@ -1,11 +1,8 @@
 package org.example.dao;
 
 import org.apache.ibatis.annotations.Param;
-import org.example.Entity.SmsLogEntity;
-import org.example.Entity.UserEntity;
-
-import java.util.List;
-import java.util.Map;
+import org.example.entity.SmsLogEntity;
+import org.example.entity.UserEntity;
 
 /**
  * @Author: houlintao

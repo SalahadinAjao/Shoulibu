@@ -1,6 +1,6 @@
 package org.example.dao;
 
-import org.example.Entity.CouponEntity;
+import org.example.entity.CouponEntity;
 
 import java.util.List;
 import java.util.Map;

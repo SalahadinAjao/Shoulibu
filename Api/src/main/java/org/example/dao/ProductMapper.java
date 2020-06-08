@@ -1,6 +1,6 @@
 package org.example.dao;
 
-import org.example.Entity.ProductEntity;
+import org.example.entity.ProductEntity;
 
 /**
  * @Author: houlintao

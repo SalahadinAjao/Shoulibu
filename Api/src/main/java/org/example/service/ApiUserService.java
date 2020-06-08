@@ -2,8 +2,8 @@ package org.example.service;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.shiro.util.Assert;
-import org.example.Entity.SmsLogEntity;
-import org.example.Entity.UserEntity;
+import org.example.entity.SmsLogEntity;
+import org.example.entity.UserEntity;
 import org.example.Util.RRException;
 import org.example.dao.ApiUserLevelMapper;
 import org.example.dao.ApiUserMapper;

@@ -1,6 +1,6 @@
 package org.example.dao;
 
-import org.example.Entity.AddressEntity;
+import org.example.entity.AddressEntity;
 
 /**
  * @Author: houlintao

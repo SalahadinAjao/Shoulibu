@@ -1,7 +1,7 @@
 package org.example.interceptor;
 
 import org.apache.commons.lang.StringUtils;
-import org.example.Entity.TokenEntity;
+import org.example.entity.TokenEntity;
 import org.example.Util.ApiRRException;
 import org.example.annotations.SkipAuth;
 import org.example.service.TokenService;

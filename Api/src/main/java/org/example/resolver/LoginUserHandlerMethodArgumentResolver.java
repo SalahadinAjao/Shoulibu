@@ -1,6 +1,6 @@
 package org.example.resolver;
 
-import org.example.Entity.UserEntity;
+import org.example.entity.UserEntity;
 import org.example.annotations.LoginUser;
 import org.example.interceptor.AuthorizationInterceptor;
 import org.example.service.ApiUserService;

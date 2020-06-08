@@ -1,8 +1,11 @@
-package org.example.Entity;
+package org.example.entity;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -92,10 +95,13 @@ public class OrderEntity implements Serializable {
     //
     private Integer goodsCount; //订单的商品
     private String order_status_text;//订单状态的处理
+
     private Map handleOption; //可操作的选项
+
     private BigDecimal full_cut_price; //订单满减
     private String full_region;//区县
     private String order_type; // 订单状态
+
 
 
     public void setId(Integer id) {
@@ -202,6 +208,7 @@ public class OrderEntity implements Serializable {
         this.goods_price = goods_price;
     }
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public void setAdd_time(Date add_time) {
         this.add_time = add_time;
     }
@@ -365,11 +372,11 @@ public class OrderEntity implements Serializable {
     public Date getAdd_time() {
         return add_time;
     }
-
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getConfirm_time() {
         return confirm_time;
     }
-
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getPay_time() {
         return pay_time;
     }
@@ -402,10 +409,6 @@ public class OrderEntity implements Serializable {
         return order_status_text;
     }
 
-    public Map getHandleOption() {
-        return handleOption;
-    }
-
     public BigDecimal getFull_cut_price() {
         return full_cut_price;
     }
@@ -416,5 +419,61 @@ public class OrderEntity implements Serializable {
 
     public String getOrder_type() {
         return order_type;
+    }
+    /**
+     * 获取操作选项状态
+     */
+    public Map getHandleOption(){
+        handleOption = new HashMap();
+
+        handleOption.put("cancle",false);//取消订单操作
+        handleOption.put("delete",false);//删除订单操作
+        handleOption.put("pay",false);//订单支付操作
+        handleOption.put("comment",false);//评价订单操作
+        handleOption.put("shipconfirm",false);//确认收货操作
+        handleOption.put("confirm",false);//订单完成确认操作
+        handleOption.put("return",false);//退换货操作
+        handleOption.put("rebuy",false);//再次购买操作
+
+        /**
+         * 订单完整周期：下单成功——>支付订单——>发货——>收货——>评论
+         * 订单相关状态字段设计，采用单个字段表示全部的订单状态
+         * 0 表示订单创建成功等待付款；
+         * 1xx 表示订单取消和删除等状态；
+         * 101：订单已取消；
+         * 102：订单已删除；
+         * 2xx 表示订单支付状态，201：订单已付款，等待发货；
+         * 3xx 表示订单物流相关状态　300：订单已发货， 301：用户确认收货 ；
+         * 4xx 表示订单退换货相关的状态　401：没有发货，退款　402：已收货，退款退货
+         */
+        //如果订单已经取消或是已完成，则可再次购买
+        if (order_status == 101) {
+            handleOption.put("rebuy", true);
+        }
+        //如果订单没有被取消，且没有支付，则可支付，可取消
+        if (order_status == 0) {
+            handleOption.put("cancel", true);
+            handleOption.put("pay", true);
+        }
+
+        //如果订单已付款，没有发货，则可退款操作
+        if (order_status == 201) {
+            handleOption.put("cancel", true);
+        }
+
+        //如果订单已经发货，没有收货，则可收货操作和退款、退货操作
+        if (order_status == 300) {
+//            handleOption.put("cancel", true);
+            handleOption.put("confirm", true);
+//            handleOption.put("return", true);
+        }
+
+        //如果订单已经支付，且已经收货，则可完成交易、评论和再次购买
+        if (order_status == 301) {
+            handleOption.put("comment", true);
+            handleOption.put("buy", true);
+        }
+        return handleOption;
+
     }
 }

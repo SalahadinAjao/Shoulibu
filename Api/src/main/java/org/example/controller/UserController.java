@@ -2,8 +2,8 @@ package org.example.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.github.qcloudsms.SmsSingleSenderResult;
-import org.example.Entity.SmsLogEntity;
-import org.example.Entity.UserEntity;
+import org.example.entity.SmsLogEntity;
+import org.example.entity.UserEntity;
 import org.example.Util.CharUtil;
 import org.example.Util.Constant;
 import org.example.Util.SmsTool;
