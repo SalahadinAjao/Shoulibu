@@ -163,7 +163,7 @@ public class OrderController extends ApiBaseAction {
     /**
      * 取消订单（然后返回前端新的订单列表）
      */
-    @RequestMapping("/cancel")
+    @RequestMapping("/cancelOrder")
     public Object cancelOrder(Integer orderId){
         OrderEntity orderEntity = orderService.queryOrderObjectById(orderId);
         if (orderEntity.getOrder_status()==300){

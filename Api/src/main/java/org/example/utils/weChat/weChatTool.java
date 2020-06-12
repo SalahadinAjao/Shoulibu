@@ -2,7 +2,6 @@ package org.example.utils.weChat;
 
 import com.alibaba.druid.support.logging.Log;
 import com.alibaba.druid.support.logging.LogFactory;
-import org.apache.commons.collections.MapUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -13,6 +12,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.example.Util.CharUtil;
 import org.example.Util.ResourceTool;
+import org.example.utils.MapUtils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -20,6 +20,9 @@ import java.lang.reflect.MalformedParameterizedTypeException;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.net.URLEncoder;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -41,13 +44,33 @@ public class weChatTool {
      */
     public static Integer CLIENTTYPE_APP = 1;
 
+    /**
+     *@date: 2020/6/12 下午12:53
+     *@param out_trade_no 外部交易单号
+     *@param orderMoney 订单实付钱
+     *@param reFundMoney 订单退款金额
+     */
     public static WechatRefundApiResult wxRefund(String out_trade_no,Double orderMoney,Double reFundMoney){
+        //bdOrderMoney的bd=BigDecimal
         BigDecimal bdOrderMoney = new BigDecimal(orderMoney, MathContext.DECIMAL32);
         BigDecimal bdRefundMoney = new BigDecimal(reFundMoney, MathContext.DECIMAL32);
 
         Map<Object, Object> param = buildRequsetMapParam(out_trade_no, bdOrderMoney, bdRefundMoney);
+        //将请求参数转变为xml格式
+        String mapToXml = MapUtils.convertMap2Xml(param);
+        try {
+            sendSSLToWx(mapToXml,WeChatConfig.getSslcsf());
 
-        String mapToXml = M
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (UnrecoverableKeyException e) {
+            e.printStackTrace();
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+
     }
     /**
      * 向微信发送https请求
@@ -90,6 +113,14 @@ public class weChatTool {
      *
      */
     public static Map<Object,Object> buildRequsetMapParam(String out_trade_no, BigDecimal bdOrderMoney, BigDecimal bdRefundMoney){
+        /**
+         * 小程序调起支付数据签名字段有5个：
+         * @appId:小程序id;
+         * @timeStamp:支付的时间戳，时间戳从1970年1月1日00:00:00至今的秒数,即当前的时间；
+         * @nonceStr:随机数；
+         * @dataPacage:数据包，统一下单接口返回的 prepay_id 参数值，提交格式如：prepay_id=wx2017033010242291fcfe0db70013231072；
+         * @signType:
+         */
         Map<Object, Object> params = new HashMap<>();
         //微信分配的公众账号ID（企业号corpid即为此appId）
         params.put("appid", ResourceTool.getConfigPropertyByName("wx.appId"));
