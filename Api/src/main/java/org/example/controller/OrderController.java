@@ -13,6 +13,8 @@ import org.example.service.KdNiaoService;
 import org.example.service.OrderGoodsService;
 import org.example.service.OrderService;
 import org.example.utils.ApiBaseAction;
+import org.example.utils.weChat.WeChatTool;
+import org.example.utils.weChat.WechatRefundApiResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -167,13 +169,57 @@ public class OrderController extends ApiBaseAction {
     public Object cancelOrder(Integer orderId){
         OrderEntity orderEntity = orderService.queryOrderObjectById(orderId);
         if (orderEntity.getOrder_status()==300){
-            return toResponsFail("您的订单已发货，无法取消订单");
+            return toResponsFail("订单已发货，无法取消订单");
         }else if (orderEntity.getOrder_status()==301){
             return toResponsFail("已收货，不能取消订单");
         }
         //退款
         if (orderEntity.getPay_status()==2){
+            //微信退款结果
+            WechatRefundApiResult wxRefund = WeChatTool.wxRefund(orderEntity.getOrder_sn(), 0.01, 0.01);
+            if (wxRefund.getResult_code().equals("SUCCESS")){
+                //201表示订单已付款，准备发货
+                if (orderEntity.getOrder_status()==201){
+                    //401表示没有发货，退款
+                    orderEntity.setOrder_status(401);
+                    //300表示订单已发货
+                }else if (orderEntity.getOrder_status()==300){
+                    //402表示已收货，申请退款退货
+                    orderEntity.setOrder_status(402);
+                }
+                //支付状态4表示退款
+                orderEntity.setPay_status(4);
+                orderService.updateOrder(orderEntity);
 
+                return toResponseMsgSuccess("订单取消成功");
+            }else {
+                return toResponsObject(400,"订单取消失败","");
+            }
+        }else {
+            //101:订单已取消
+            orderEntity.setOrder_status(101);
+            orderService.updateOrder(orderEntity);
+
+            return toResponseSuccess("订单取消成功");
         }
+
+        //return toResponsFail("提交失败");
+    }
+
+    @RequestMapping("confirmorder")
+    public Object confirmOrder(Integer orderId){
+        try {
+            OrderEntity order = orderService.queryOrderObjectById(orderId);
+            order.setOrder_status(301);
+            order.setShopping_status(2);
+            order.setConfirm_time(new Date());
+
+            orderService.updateOrder(order);
+
+            return toResponseSuccess("确认成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return toResponsFail("提交失败");
     }
 }

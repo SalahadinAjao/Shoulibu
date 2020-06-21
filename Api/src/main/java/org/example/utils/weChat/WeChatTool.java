@@ -16,7 +16,6 @@ import org.example.utils.MapUtils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.MalformedParameterizedTypeException;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.net.URLEncoder;
@@ -31,9 +30,9 @@ import java.util.*;
  * @Date:2020/6/7 下午4:06
  * 微信退款工具类
  */
-public class weChatTool {
+public class WeChatTool {
 
-    private static Log log = LogFactory.getLog(weChatTool.class);
+    private static Log log = LogFactory.getLog(WeChatTool.class);
 
     /**
      * 充值客户端类型--微信公众号

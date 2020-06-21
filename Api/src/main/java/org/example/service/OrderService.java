@@ -80,6 +80,7 @@ public class OrderService {
      */
     @Transactional
     public Map<String,Object> submit(JSONObject jsonParam, UserEntity userEntity){
+        //新建一个map对象用于存放结果数据
         HashMap<String, Object> resultObj = new HashMap<>();
         //从jsonParam中获取与本次交易绑定的优惠券id
         Integer couponid = jsonParam.getInteger("couponId");
@@ -94,12 +95,12 @@ public class OrderService {
         AddressEntity addressEntity = addressMapper.queryObject(jsonParam.getInteger("addressId"));
         //运费
         Integer freightPrice = 0;
-        //选中的商品列表
-        List<CartEntity> checkedGoodsList = new ArrayList<>();
+        //选中的商品的购物车列表
+        List<CartEntity> checkedGoodsCartList = new ArrayList<>();
         //商品总价
         BigDecimal goodsTotalPrice= null;
         /**
-         * 如果是从购物车提交的就需要为其分配一个购物车了
+         * 如果是从购物车提交的就需要为其分配购物车了
          */
         if (type.equals("cart")){
             HashMap<String, Object> cartMap = new HashMap<>();
@@ -109,15 +110,20 @@ public class OrderService {
             //checked=1表示选中
             cartMap.put("checked",1);
 
-            //从数据库的cart表中取出被选中的商品
-            checkedGoodsList = cartMapper.queryList(cartMap);
+            /**
+             * 从数据库的cart表中取出对应的购物车列表，实际上在用户在前端将一个选中的商品加入购物车的时候系统
+             * 就会为此商品分配对应的购物车，也就是一款产品对应着一个购物车，并不是n个产品都放在一个购物车中；
+             * 用户添加n个产品就会进n个购物车，在用户完成清空购物车或者删除购物车时购物车会被删除；
+             */
+            checkedGoodsCartList = cartMapper.queryList(cartMap);
 
-            if (checkedGoodsList == null){
+            if (checkedGoodsCartList == null){
                 resultObj.put("errno",400);
                 resultObj.put("errmsg","请选择商品");
 
                 return resultObj;
             }
+            //如果购物车列表不为空
             goodsTotalPrice = new BigDecimal(0.00);
             /**
              * 我们平时通过电商购物（如京东，天猫，拼多多）的购物车其实相当于一个购物车列表
@@ -126,10 +132,10 @@ public class OrderService {
              * a和b是独立的；
              * 我们通过APP的“购物车”页面看到的购物车内容是a和b组成的列表
              */
-            for (CartEntity cartEntity:checkedGoodsList){
+            for (CartEntity cartEntity:checkedGoodsCartList){
                 goodsTotalPrice = goodsTotalPrice.add(cartEntity.getRetail_price().multiply(new BigDecimal(cartEntity.getNumber())));
             }
-        }else {//直接购买商品，也需分配购物车
+        }else {//直接购买商品
             //buyGoodsEntity表示我们购买的商品
             BuyGoodsEntity buyGoodsEntity = (BuyGoodsEntity) J2CacheTool.get(J2CacheTool.SHOP_CACHE_NAME, "goods" + userEntity.getUserId());
             //通过我们所购买的产品buyGoodsEntity获取到产品id,进而获取到对应的productEntity
@@ -148,7 +154,7 @@ public class OrderService {
             cartEntity.setNumber(buyGoodsEntity.getNumber());
             cartEntity.setProduct_id(buyGoodsEntity.getProductId());
 
-            checkedGoodsList.add(cartEntity);
+            checkedGoodsCartList.add(cartEntity);
         }
 
         //获取与此订单相关的优惠券信息
@@ -216,7 +222,7 @@ public class OrderService {
         }
         ArrayList<OrderGoodsEntity> orderGoodsEntities = new ArrayList<>();
 
-        for (CartEntity goodsItem:checkedGoodsList){
+        for (CartEntity goodsItem:checkedGoodsCartList){
 
             OrderGoodsEntity orderGoodsEntity = new OrderGoodsEntity();
 
@@ -236,7 +242,7 @@ public class OrderService {
 
             orderGoodsMapper.save(orderGoodsEntity);
         }
-        //清空已购买的商品
+        //清空已购买的商品，在用户清空购物车的时候
             cartMapper.deleteByCart(userEntity.getUserId(),1,1);
             resultObj.put("errno", 0);
             resultObj.put("errmsg", "订单提交成功");
