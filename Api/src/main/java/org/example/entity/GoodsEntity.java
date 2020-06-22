@@ -27,7 +27,7 @@ public class GoodsEntity implements Serializable {
     private Integer goods_number;
     //关键字
     private String keywords;
-    //简明介绍
+    //简介
     private String goods_brief;
     //商品描述
     private String goods_desc;

@@ -27,7 +27,7 @@ public class ProductEntity implements Serializable {
     private Integer goods_number;
     //零售价格
     private BigDecimal market_price;
-    //时长价
+    //零售价
     private BigDecimal retail_price;
     //商品名称
     private String goods_name;

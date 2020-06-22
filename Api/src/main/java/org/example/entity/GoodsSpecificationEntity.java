@@ -9,7 +9,7 @@ import java.io.Serializable;
  * @Date:2020/6/21 下午3:26
  * @email 437547058@qq.com
  * @Version 1.0
- * 商品对应规格表值表
+ * 商品规格实体类
  */
 public class GoodsSpecificationEntity implements Serializable {
 

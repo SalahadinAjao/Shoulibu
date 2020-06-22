@@ -193,6 +193,7 @@ public class CartController extends ApiBaseAction {
         }
         //如果购物车不存在就新建一个
         if (cartInfo==null){
+            //商品规格值
             String[] goodsSpecificationValue = null;
             /**
              * productEntity是前端传递过来的，通过它可以获取此产品的不同规格的id
@@ -203,6 +204,7 @@ public class CartController extends ApiBaseAction {
                 String[] idsArray = getSpecificationIdsArray(productEntity.getGoods_specification_ids());
                 specificationParam.put("ids",idsArray);
                 specificationParam.put("goods_id",goodsId);
+
                 List<GoodsSpecificationEntity> specificationList = goodsSpecificationService.queryList(specificationParam);
                 goodsSpecificationValue = new String[specificationList.size()];
 
@@ -232,7 +234,7 @@ public class CartController extends ApiBaseAction {
             cartService.save(cartInfo);
         }else {
             //如果已经存在购物车中，则数量增加
-            //从数据库查询到的product数量小于(前端购买的数量+购物车中的数量)
+            //从数据库查询到的product数量小于(当前购买的数量+购物车中的数量)
             if (productEntity.getGoods_number()<(number+cartInfo.getNumber())){
                 return this.toResponsObject(400, "库存不足", "");
             }
