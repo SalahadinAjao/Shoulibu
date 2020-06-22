@@ -14,7 +14,7 @@ public interface CartMapper extends BaseDao<CartEntity> {
     void updateCheck(@Param("productIds") String[] productIds,
                      @Param("isChecked") Integer isChecked, @Param("userId") Long userId);
 
-    void deleteByProductIds(@Param("productIds") String[] productIds);
+    void deleteByProductIds(@Param("productIds") Integer[] productIds);
 
     void deleteByUserAndProductIds(@Param("user_id") Long user_id,@Param("productIds") String[] productIds);
 

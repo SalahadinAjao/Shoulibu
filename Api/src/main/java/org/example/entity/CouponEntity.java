@@ -42,7 +42,7 @@ public class CouponEntity implements Serializable {
     //使用结束时间
     @JsonFormat(pattern = "yyyy年MM月dd日")
     private Date use_end_date;
-    //最小商品金额
+    //可以使用此优惠券所需的最低商品消费金额
     private BigDecimal min_goods_amount;
     //优惠券说明
     private String coupon_txt;

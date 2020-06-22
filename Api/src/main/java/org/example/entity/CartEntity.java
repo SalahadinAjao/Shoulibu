@@ -37,7 +37,7 @@ public class CartEntity implements Serializable {
     private String goods_specifition_name_value;
     //product表对应的goods_specifition_ids
     private String goods_specifition_ids;
-    //
+    //是否选中
     private Integer checked;
     // 节省金额
     private BigDecimal crash_save_price;
