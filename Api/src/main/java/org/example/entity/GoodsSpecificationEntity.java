@@ -19,12 +19,13 @@ public class GoodsSpecificationEntity implements Serializable {
     private Integer id;
     //商品
     private Integer goods_id;
-    //规范Id
+    //规格Id
     private Integer specification_id;
-    //规范说明
+    //规格值
     private String value;
+    //规格名
     private String name;
-    //规范图片
+    //规格图片
     private String pic_url;
 
     public void setId(Integer id) {

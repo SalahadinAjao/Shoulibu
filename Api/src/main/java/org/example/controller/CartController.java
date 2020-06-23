@@ -254,4 +254,113 @@ public class CartController extends ApiBaseAction {
         }
         return idsArray;
     }
+
+    @PostMapping("update")
+    public Object update(@LoginUser UserEntity loginUser) throws IOException {
+
+        JSONObject jsonRequestParam = getJsonRequest();
+        Integer goodsId = jsonRequestParam.getInteger("goodsId");
+        Integer productId = jsonRequestParam.getInteger("productId");
+        Integer number = jsonRequestParam.getInteger("number");
+        //购物车id
+        Integer cartId = jsonRequestParam.getInteger("id");
+        //通过前端传递过来的productId获取后台此产品的实体，实体包含了产品当前的数量等信息
+        ProductEntity productEntity = productService.queryObject(productId);
+        if (productEntity==null || productEntity.getGoods_number()<number){
+            return this.toResponsObject(400,"库存不足","");
+        }
+         //产品库存充足，使用cartId查找对应的购物车对象
+        CartEntity cartEntity = cartService.queryObject(cartId);
+        /**
+         * 判断购物车的产品id是否与从request对象中获取的产品id相同，如果相同就说明
+         * 是同一个购物车，可以更新数量；
+         * 这里只更新数量。
+         * cartEntity 是通过购物车id查到的购物车实体
+         */
+        if (cartEntity.getProduct_id().equals(productId)){
+            cartEntity.setNumber(number);
+            cartService.update(cartEntity);
+            return toResponseSuccess(getCart(loginUser));
+        }
+
+        Map cartQueryParam = new HashMap();
+        cartQueryParam.put("goodsId",goodsId);
+        cartQueryParam.put("productId",productId);
+        //这次是使用goodsId和productId查询购物车
+        List<CartEntity> cartList = cartService.queryList(cartQueryParam);
+
+        CartEntity newCart = null != cartList && cartList.size()>0? cartList.get(0):null;
+        //newCart为空==>cartList为空，需要新建购物车
+        if (newCart == null){
+            //使用一个string数组存放产品规格值
+            String[] goddsSpecificationValue = null;
+
+            if (productEntity.getGoods_specification_ids() != null){
+                Map specifQueryParam = new HashMap();
+                specifQueryParam.put("ids",productEntity.getGoods_specification_ids());
+                specifQueryParam.put("goods_id",productEntity.getGoods_id());
+
+                /**
+                 * 每一个 GoodsSpecificationEntity中保存的是此产品相关的规格数据：id，商品id，规格id，规格名，规格值，图片链接
+                 */
+                List<GoodsSpecificationEntity> goodSpecifList = goodsSpecificationService.queryList(specifQueryParam);
+
+                goddsSpecificationValue = new String[goodSpecifList.size()];
+
+                for (int a=0;a<goodSpecifList.size();a++){
+                    //goddsSpecificationValue数组中保存的是字符串
+                    goddsSpecificationValue[a] = goodSpecifList.get(a).getValue();
+                }
+            }
+            //继续完善购物车信息
+            newCart.setProduct_id(productId);
+            newCart.setGoods_sn(productEntity.getGoods_sn());
+            newCart.setNumber(number);
+            newCart.setRetail_price(productEntity.getRetail_price());
+            newCart.setMarket_price(productEntity.getMarket_price());
+
+            if (goddsSpecificationValue != null){
+                //这一步是设置购物车内商品属性名值对的，形如 白色;XL；女；中国;http://www.google  这样
+                newCart.setGoods_specifition_name_value(com.qiniu.util.StringUtils.join(goddsSpecificationValue,";"));
+            }
+            newCart.setGoods_specifition_ids(productEntity.getGoods_specification_ids());
+            cartService.update(newCart);
+            //能够查询到购物车==>更新购物车
+        }else {
+            //新的购物车产品数量=原来的购物车数量+用户新选择的产品数量
+            Integer newCartNumber = number+newCart.getNumber();
+
+            if (productEntity == null || productEntity.getGoods_number()<newCartNumber){
+                return toResponsObject(400,"库存不足","");
+            }
+            //删除购物车
+            cartService.delete(newCart.getId());
+
+            String[] goodsSepcifitionValue = null;
+            if (null != productEntity.getGoods_specification_ids()) {
+                Map specificationParam = new HashMap();
+                specificationParam.put("ids", productEntity.getGoods_specification_ids());
+                specificationParam.put("goodsId", goodsId);
+                List<GoodsSpecificationEntity> specificationEntities = goodsSpecificationService.queryList(specificationParam);
+                goodsSepcifitionValue = new String[specificationEntities.size()];
+                for (int i = 0; i < specificationEntities.size(); i++) {
+                    goodsSepcifitionValue[i] = specificationEntities.get(i).getValue();
+                }
+            }
+            cartEntity.setProduct_id(productId);
+            cartEntity.setGoods_sn(productEntity.getGoods_sn());
+            cartEntity.setNumber(number);
+            cartEntity.setRetail_price(productEntity.getRetail_price());
+           cartEntity.setMarket_price(productEntity.getRetail_price());
+            if (null != goodsSepcifitionValue) {
+                cartEntity.setGoods_specifition_name_value(com.qiniu.util.StringUtils.join(goodsSepcifitionValue, ";"));
+            }
+           cartEntity.setGoods_specifition_ids(productEntity.getGoods_specification_ids());
+            cartService.update(cartEntity);
+        }
+
+        return toResponseSuccess(getCart(loginUser));
+    }
+
+
 }

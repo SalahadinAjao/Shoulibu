@@ -21,7 +21,7 @@ public class CartService {
     @Autowired
     private CartMapper cartDao;
 
-    private CartEntity queryObject(Integer id){
+    public CartEntity queryObject(Integer id){
         return cartDao.queryObject(id);
     }
 
