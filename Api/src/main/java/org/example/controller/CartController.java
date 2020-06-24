@@ -362,5 +362,4 @@ public class CartController extends ApiBaseAction {
         return toResponseSuccess(getCart(loginUser));
     }
 
-
 }

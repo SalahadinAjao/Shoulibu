@@ -3,12 +3,20 @@ package org.example.utils.weChat;
 import com.alibaba.druid.support.logging.Log;
 import com.alibaba.druid.support.logging.LogFactory;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
 import org.example.Util.CharUtil;
 import org.example.Util.ResourceTool;
@@ -28,7 +36,7 @@ import java.util.*;
 /**
  * @Author: houlintao
  * @Date:2020/6/7 下午4:06
- * 微信退款工具类
+ * 微信工具类
  */
 public class WeChatTool {
 
@@ -212,4 +220,40 @@ public class WeChatTool {
         return packageSign;
     }
 
+    public static String requestOnce(final String url,String data) throws IOException {
+        BasicHttpClientConnectionManager connectionManager;
+        connectionManager = new BasicHttpClientConnectionManager(
+                RegistryBuilder.<ConnectionSocketFactory>create()
+                        .register("http", PlainConnectionSocketFactory.getSocketFactory())
+                        .register("https", SSLConnectionSocketFactory.getSocketFactory())
+                        .build(),
+                null,
+                null,
+                null
+        );
+
+       HttpClient httpClient = HttpClientBuilder.create()
+                .setConnectionManager(connectionManager)
+                .build();
+       //使用传入的url创建一个httpPost对象
+        HttpPost httpPost = new HttpPost(url);
+        //对requeest对象的设置
+        RequestConfig requestConfig = RequestConfig.custom()
+                .setSocketTimeout(5000)
+                .setConnectTimeout(5000)
+                .setConnectionRequestTimeout(10000).build();
+
+        httpPost.setConfig(requestConfig);
+        //使用UTF-8字符集将请求数据data解析并封装为一个post实体对象
+        StringEntity postEntity = new StringEntity(data, "UTF-8");
+        httpPost.addHeader("Content-Type", "text/xml");
+        httpPost.addHeader("User-Agent", "wxpay sdk java v1.0 " + ResourceTool.getConfigPropertyByName("wx.mchId"));
+        httpPost.setEntity(postEntity);
+        //执行请求并返回response对象
+        HttpResponse httpResponse = httpClient.execute(httpPost);
+        HttpEntity httpEntity = httpResponse.getEntity();
+        String reusltObj = EntityUtils.toString(httpEntity, "UTF-8");
+        log.info("请求结果:" + reusltObj);
+        return reusltObj;
+    }
 }
