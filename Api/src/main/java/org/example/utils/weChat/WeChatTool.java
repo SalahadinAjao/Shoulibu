@@ -165,7 +165,7 @@ public class WeChatTool {
 
     /**
      * @param params map参数
-     * @param paySignKey 支付签名的key
+     * @param paySignKey 微信提供的支付签名的key
      */
     public static String arraySign(Map<Object,Object> params,String paySignKey){
         //是否加密的触发flag
@@ -187,10 +187,10 @@ public class WeChatTool {
                 //将first值取反
                 first=false;
             }else {//如果first值为false
-                //向temp中添加"&"
+                //向temp中添加"&"，第二次遍历的时候temp中就成了 key11的值=valueString1的值& 这样
                 temp.append("&");
             }
-            //此时temp中是形如 &key= 这样的内容
+            //此时temp中是形如 key的值= 这样的内容
             temp.append(key).append("=");
             //params是个Map，get(key)返回的是Object
             Object value = params.get(key);
@@ -202,20 +202,22 @@ public class WeChatTool {
                 valueString = value.toString();
             }//encode=true需要转化
             if (encode){
-                try {//此时temp中的内容变成了 &key1=XXXXX&key2=YYYY&key3=XZZZ 这样
+                try {
+                    //使用utf-8字符集将原数据解析成XXXX格式
                     temp.append(URLEncoder.encode(valueString,"UTF-8"));
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
-            }else {//否则直接存储
+            }else {//否则直接存储，第一次的时候temp中 key的值=valueString的值 这种数据；
                 temp.append(valueString);
             }
         }
 
-        //最后将paySignKey加上，temp中就是 &key1=XXXXX&key2=YYYY&key3=XZZZ.....&key=paysignkey
+        //最后将paySignKey加上，temp中就是 key1=XXXXX&key2=YYYY&key3=XZZZ.....&key=paysignkey
         temp.append("&key=");
         temp.append(paySignKey);
         System.out.println(temp.toString());
+        //使用MD5加密数据
         String packageSign = MD5.getMessageDigest(temp.toString());
         return packageSign;
     }

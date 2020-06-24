@@ -67,7 +67,11 @@ public class PayController extends ApiBaseAction {
 
         //生成一个随机字符串
         String nonceStr = CharUtil.getRandomString(32);
-        //使用一个TreeMap容器持有结果
+        //使用一个TreeMap容器持有待返回的结果
+        /**
+         * TreeMap依靠红黑树实现，是有序的，取出的时候也是有序的；；而HashMap是无序的；
+         * TreeMap适用于按照自然顺序或者自定义的顺序遍历key；
+         */
         Map<Object,Object> resultObj = new TreeMap();
         //使用TreeMap持有对微信支付的请求参数
         Map<Object,Object> wxPayParam = new TreeMap<Object, Object>();
@@ -110,7 +114,7 @@ public class PayController extends ApiBaseAction {
         String sign = WeChatTool.arraySign(wxPayParam,ResourceTool.getConfigPropertyByName("wx.paySignKey"));
         wxPayParam.put("sign",sign);
 
-        //把TreeMap的 wxPayParam转换为xml字符串
+        //把TreeMap的 wxPayParam转换为字符串
         String xmlStr = MapUtils.convertMap2Xml(wxPayParam);
 
         //请求微信支付统一下单接口，使用xmlStr作为请求参数执行微信支付

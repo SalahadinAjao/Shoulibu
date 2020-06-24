@@ -8,7 +8,7 @@ import java.util.ResourceBundle;
  * @Date:2020/6/1 下午6:20
  * @email 437547058@qq.com
  * @Version 1.0
- * 参数处理工具类
+ * java资源包，参数处理工具类
  */
 public class ResourceTool {
     private static ResourceTool RESOURCE_TOOL=null;
@@ -51,7 +51,6 @@ public class ResourceTool {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-
         return value;
     }
 

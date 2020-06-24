@@ -56,6 +56,10 @@ public class XmlUtils {
         //声明一个map用于存放xml字符串数据
         Map<String,Object> map = new HashMap<String, Object>();
         //将xml字符串数据转换为Document对象
+        /**
+         * xmlStr中的数据是类似于 <xml><a>huj</a><b>gikuh</b><c>lll</c></xml> 这样的
+         * Document可以将它们解析成对应的element
+         */
         Document document = DocumentHelper.parseText(xmlStr);
         //获取根元素
         Element rootElement = document.getRootElement();
