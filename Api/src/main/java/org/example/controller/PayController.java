@@ -5,6 +5,7 @@ import org.dom4j.DocumentException;
 import org.example.Util.CharUtil;
 import org.example.Util.DateTool;
 import org.example.Util.ResourceTool;
+import org.example.Util.cache.J2CacheTool;
 import org.example.annotations.LoginUser;
 import org.example.entity.OrderEntity;
 import org.example.entity.OrderGoodsEntity;
@@ -23,10 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * @Author: houlintao
@@ -161,8 +159,80 @@ public class PayController extends ApiBaseAction {
                 orderEntity.setPay_status(1);
 
                 orderService.updateOrder(orderEntity);
+                return toResponsObject(0,"微信统一下单支付成功",resultObj);
             }
         }
         return toResponsObject(0,"微信统一下单支付成功",resultObj);
+    }
+    /**
+     * 查询微信订单状态
+     */
+    @PostMapping("query")
+    public Object queryWxOrderStatus(@LoginUser UserEntity loginUser,Integer orderId){
+        if (orderId==null){
+            return toResponsFail("订单不存在");
+        }
+        OrderEntity orderEntity = orderService.queryOrderObjectById(orderId);
+
+        Map<Object,Object> param = new TreeMap<>();
+        param.put("appid",ResourceTool.getConfigPropertyByName("wx.addId"));
+        param.put("mch_id",ResourceTool.getConfigPropertyByName("wx.mch_id"));
+        String randomStr = CharUtil.getRandomString(18).toUpperCase();
+        param.put("nonceStr",randomStr);
+        param.put("out_trade_no",orderEntity.getOrder_sn());
+
+        String sign = WeChatTool.arraySign(param,ResourceTool.getConfigPropertyByName("wx.paySignKey"));
+
+        param.put("sign",sign);
+        //将map转换为字符串
+        String xml = MapUtils.convertMap2Xml(param);
+
+        Map<String,Object> resultUn = null;
+        try {
+            String requestOnce = WeChatTool.requestOnce(ResourceTool.getConfigPropertyByName("wx.orderquery"), xml);
+            resultUn = XmlUtils.xmlStrToMap(requestOnce);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return toResponsFail("查询失败,err_no ="+e.getMessage());
+        } catch (DocumentException e) {
+            e.printStackTrace();
+            return toResponsFail("查询失败,err_no = "+e.getMessage());
+        }
+        String return_code = MapUtils.getString("return_code", resultUn);
+        String return_msg = MapUtils.getString("return_msg", resultUn);
+
+        if (!return_code.equals("SUCCESS")){
+            return toResponsFail("查询失败,error=" + return_msg);
+        }
+
+        String trade_state = MapUtils.getString("trade_state", resultUn);
+
+        if (trade_state.equals("SUCCESS")){
+            OrderEntity newOrderEntity = new OrderEntity();
+            newOrderEntity.setId(orderId);
+            newOrderEntity.setPay_status(2);
+            newOrderEntity.setOrder_status(201);
+            newOrderEntity.setShopping_status(0);
+            newOrderEntity.setPay_time(new Date());
+
+            orderService.updateOrder(newOrderEntity);
+
+            return toResponseSuccess("支付成功");
+        }else if (trade_state.equals("USERPAYING")){
+            //从J2Cache缓存中获取本次订单的请求次数
+            Integer num = (Integer) J2CacheTool.get(J2CacheTool.SHOP_CACHE_NAME, "queryRepeatNum" + orderId + "");
+            if (num==null){
+                //向J2Cache缓存中存入请求次数为1
+                J2CacheTool.put(J2CacheTool.SHOP_CACHE_NAME,"queryRepeatNum"+orderId+"",1);
+                //递归调用自身
+                this.queryWxOrderStatus(loginUser,orderId);
+            }else if (num<=3){
+                J2CacheTool.remove(J2CacheTool.SHOP_CACHE_NAME, "queryRepeatNum" + orderId);
+                this.queryWxOrderStatus(loginUser, orderId);
+            }else {
+                return toResponsFail("查询失败,error=" + trade_state);
+            }
+        }
+        return toResponsFail("查询失败，未知错误");
     }
 }

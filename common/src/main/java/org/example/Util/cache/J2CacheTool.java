@@ -135,4 +135,8 @@ public class J2CacheTool {
     public static Collection<String> keys(String cacheName){
         return cache.keys(cacheName);
     }
+
+    public static void remove(String cacheName, String key){
+        cache.evict(cacheName,key);
+    }
 }

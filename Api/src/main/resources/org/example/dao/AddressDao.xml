@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.example.dao.AddressMapper">
+    <resultMap id="addressMapper" type="org.example.entity.AddressEntity">
+        <result property="id" column="id" />
+        <result property="userId" column="user_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="telNumber" column="tel_number"/>
+        <result property="postalCode" column="postal_code"/>
+        <result property="nationalCode" column="national_Code"/>
+        <result property="provinceName" column="province_Name"/>
+        <result property="cityName" column="city_Name"/>
+        <result property="countyName" column="county_Name"/>
+        <result property="detailInfo" column="detail_Info"/>
+        <result property="is_default" column="is_default"/>
+    </resultMap>
+
+    <select id="queryList" resultMap="addressMapper">
+        select * from shoulibu_address
+        <where>
+            <if test="user_id != null">
+                and user_id = #{userId}
+            </if>
+        </where>
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+            <otherwise>
+                order by id desc
+            </otherwise>
+        </choose>
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="queryObject" resultMap="addressMapper">
+        select * from shoulibu_address where id = #{value}
+    </select>
+</mapper>
