@@ -27,7 +27,7 @@ import java.io.IOException;
  * @Version 1.0
  */
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/user")
 public class UserController extends ApiBaseAction {
     @Autowired
     private ApiUserService userService;
