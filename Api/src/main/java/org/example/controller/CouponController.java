@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import com.alibaba.druid.sql.visitor.functions.Char;
 import com.alibaba.fastjson.JSONObject;
 import org.example.Util.CharUtil;
 import org.example.Util.StringUtils;
@@ -250,7 +251,67 @@ public class CouponController extends ApiBaseAction {
              return toResponsFail("领取失败");
          }
      }
+    /**
+     * 转发领红包
+     * @param loginUser 当前用户
+     * @param sourceKey 转发的来源的key
+     * @param referrer 转发分享人的id
+     */
+     @PostMapping("transActivit")
+     public Object transAActivit(@LoginUser UserEntity loginUser,String sourceKey,Long referrer) throws IOException {
+         JSONObject jsonRequest = getJsonRequest();
 
+         Map couponParam = new HashMap();
 
+         couponParam.put("user_id",loginUser.getUserId());
+         //send_type=2 是商品转发送的券
+         couponParam.put("send_type",2);
+         couponParam.put("source_key",sourceKey);
 
+         List<CouponEntity> coupons = couponService.queryUserCoupons(couponParam);
+
+         if (coupons!=null && coupons.size()>0){
+             return toResponsObject(2,"已经领取过了",coupons);
+         }
+         //领取
+         Map couponQueryParam = new HashMap();
+         //转发赠券
+         couponQueryParam.put("send_type",2);
+         //获取满足条件的用户可用最大面值优惠券
+         /**
+          * 背景：在设计优惠券的时候需要考虑同一发券类型下的不同属性优惠券的问题。例如当我发一个用户转发送的优惠券时，send_type=2，此时
+          * 不可能我只最终发布一种面值为5元的优惠券，我还可以以后随着业务发展设计一种面值为1的优惠券，以此类推。因此在数据库中的优惠券表中
+          * 当send_type字段值为2的时候可以有多个面值，使用日期等不同的优惠券。
+          * 而在新用户注册时候发给用户的优惠券一般设置同类发布类型中面值最大的。
+          */
+         CouponEntity couponEntity = couponService.queryUserMaxCoupon(couponQueryParam);
+
+         if (couponEntity!=null){
+             //用户优惠券
+             UserCouponEntity userCouponEntity = new UserCouponEntity();
+             //设置领券时间
+             userCouponEntity.setAdd_time(new Date());
+             userCouponEntity.setCoupon_id(couponEntity.getId());
+             //设置优惠券号码
+             userCouponEntity.setCoupon_number(CharUtil.getRandomString(12));
+             userCouponEntity.setUser_id(loginUser.getUserId());
+             userCouponEntity.setSource_key(sourceKey);
+             userCouponEntity.setReferrer(referrer);
+             //将此用户优惠券对象存入数据库
+             userCouponService.save(userCouponEntity);
+
+             List<UserCouponEntity> userCOuponList = new ArrayList<>();
+             userCOuponList.add(userCouponEntity);
+
+             couponParam.put("user_id",loginUser.getUserId());
+             couponParam.put("send_type",2);
+             couponParam.put("sourec_key",sourceKey);
+
+            coupons = couponService.queryUserCoupons(couponParam);
+
+            return toResponseSuccess(coupons);
+         }else {
+             return toResponsFail("领取失败");
+         }
+     }
 }

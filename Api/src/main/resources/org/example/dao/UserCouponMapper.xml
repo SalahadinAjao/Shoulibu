@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.example.dao.UserCouponMapper">
+    <resultMap id="userCouponMap" type="org.example.entity.UserCouponEntity">
+        <result property="id" column="id"/>
+        <result property="coupon_id" column="coupon_id"/>
+        <result property="coupon_number" column="coupon_number"/>
+        <result property="user_id" column="user_id"/>
+        <result property="used_time" column="used_time"/>
+        <result property="add_time" column="add_time"/>
+        <result property="order_id" column="order_id"/>
+        <result property="source_key" column="source_key"/>
+        <result property="referrer" column="referrer"/>
+    </resultMap>
+</mapper>
