@@ -1,5 +1,8 @@
 package org.example.controller;
 
+import com.alibaba.fastjson.JSONObject;
+import org.example.Util.CharUtil;
+import org.example.Util.StringUtils;
 import org.example.Util.cache.J2CacheTool;
 import org.example.annotations.LoginUser;
 import org.example.entity.*;
@@ -11,11 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Author: houlintao
@@ -61,6 +62,7 @@ public class CouponController extends ApiBaseAction {
         BigDecimal goodsTotalPrice = new BigDecimal(0.00);
 
         if (type.equals("cart")){
+            //如果是type的值为cart，说明是购物车支付=>从数据库查询订单信息，购物车信息
             Map cartParam = new HashMap();
             cartParam.put("user_id",loginUser.getUserId());
             //查询此用户的所有购物车
@@ -129,6 +131,126 @@ public class CouponController extends ApiBaseAction {
         enableCoupons.addAll(unenableCoupons);
         return toResponseSuccess(enableCoupons);
     }
+     /**
+      * 使用优惠码兑换优惠券
+      * 优惠码在用户点击“获取优惠码”后由系统创建后通过SMS(Short Message Service)服务以短信的方式发送给用户
+      * 或者直接由程序返回给前端；
+      * 在后端创建优惠码的时候需要新建一个优惠券对象将此优惠码与优惠券绑定并存储进数据库，同时需要创建一个用户优惠券对象
+      * 将新建的优惠券对象id传进去并设置其未兑换；
+      */
+     @PostMapping("/exchangeCoupon")
+     public Object exchangeCoupon(@LoginUser UserEntity looginUser){
+         try {
+             JSONObject jsonRequest = getJsonRequest();
+             String coupon_number = jsonRequest.getString("coupon_number");
+
+             if (StringUtils.isNullOrEmpty(coupon_number)){
+                 return toResponsFail("当前优惠码不存在");
+             }
+             Map userCouponParam = new HashMap();
+             userCouponParam.put("coupon_number",coupon_number);
+             List<UserCouponEntity> userCouponList = userCouponService.queryList(userCouponParam);
+
+             UserCouponEntity userCouponEntity = null;
+
+             if (userCouponList == null || userCouponList.size()==0){
+                 return toResponsFail("当前优惠码无效");
+             }
+             //一个优惠码只能对应一个UserCouponEntity
+             userCouponEntity = userCouponList.get(0);
+             /**
+              * 当一个优惠码刚被创建时就会在系统创建对应的用户优惠券对象并将此对象的userId为0L，一旦此优惠码被兑换成优惠券系统就会
+              * 将用户优惠券对象的userId设置为当前兑换用户的userId；
+              */
+             if (userCouponEntity.getUser_id()!=null && !userCouponEntity.getUser_id().equals(0L)){
+                 return toResponsFail("当前优惠码已被兑换");
+             }
+
+             CouponEntity couponEntity = couponService.queryObject(userCouponEntity.getCoupon_id());
+             if (couponEntity==null || couponEntity.getUse_end_date()==null || couponEntity.getUse_end_date().before(new Date())){
+                 return toResponsFail("优惠码已过期");
+             }
+             userCouponEntity.setUser_id(looginUser.getUserId());
+             userCouponEntity.setAdd_time(new Date());
+
+             userCouponService.update(userCouponEntity);
+
+             return toResponseSuccess(userCouponEntity);
+         } catch (IOException e) {
+             e.printStackTrace();
+         }
+         return null;
+     }
+     /**
+      * 填写手机号和验证码领券，新用户专属，这一步的使用场景是用户需要先输入手机号获取到验证码，然后将手机号和验证码
+      * 一并作为参数提交到后台。只有用户第一次填写手机号才可以领取，以后更改手机号是不可以领取了。所以重点是如何判断用户
+      * 是新用户还是老用户：新用户的用户实体中的手机号属性是null的而老用户则相反！
+      * 新用户领取优惠券
+      */
+     @PostMapping("/newUserCoupon")
+     public Object newUserCoupon(@LoginUser UserEntity loginUser) throws IOException {
+         JSONObject jsonRequest = getJsonRequest();
+         //从请求对象中获取手机号
+         String phone = jsonRequest.getString("phone");
+         //从请求对象获取验证码
+         Integer smsCode = jsonRequest.getInteger("smsCode");
+         /**
+          * 通过userId查找对应的短信日志记录，由于验证码实效是30min，超过30min验证码失效，因此不需要担心通过userId查询到
+          * 多条smsLog实体，因为在验证码失效前查到的就只有一条记录，失效后就查不到。
+          */
+         SmsLogEntity smsLogEntity = userService.querySmsCodeByUserId(loginUser.getUserId());
+
+         if (smsLogEntity!=null && smsLogEntity.getSms_code()!=smsCode){
+             return toResponsFail("验证码错误");
+         }
+         //验证码无误则更新手机号
+         if (!StringUtils.isNullOrEmpty(phone)){
+             /**
+              * 拿用户前端传递过来的phone的值与当前登录系统的用户的getMobile()方法返回的手机号对比：
+              * 如果相等=>是老用户，老用户不做处理；
+              * 如果是新用户则getMobile方法返回的是null，与phone并不相等=>新用户；
+              */
+             if (phone.equals(loginUser.getMobile())){
+                 loginUser.setMobile(phone);
+                 userService.update(loginUser);
+             }
+         }
+         //判断是否为新用户，如果是老用户=> loginUser.getMobile()返回值不为null
+          if (!StringUtils.isNullOrEmpty(loginUser.getMobile())){
+              return toResponsFail("非新注册用户无法领取");
+          }
+          //如果当前用户是新用户，则判断其是否已经领取过了
+         Map couponParam = new HashMap();
+          couponParam.put("user_id",loginUser.getUserId());
+          //send_type=4 =>新用户优惠券
+          couponParam.put("send_type",4);
+
+         List<UserCouponEntity> userCouponEntityList = couponService.queryUserCoupons(couponParam);
+
+         if (userCouponEntityList != null && userCouponEntityList.size()>0){
+             return toResponsFail("已领券，请不要重复领取");
+         }
+         //新用户领券
+         Map couponQuery = new HashMap();
+         couponQuery.put("send_type",4);
+         //基于send_type分类查询用户可用的抵扣值最大的优惠券，即在这里会返回一个新用户可用的面值最大的优惠券
+         CouponEntity couponEntity = couponService.queryUserMaxCoupon(couponQuery);
+
+         if (couponEntity!=null){
+             UserCouponEntity userCouponEntity = new UserCouponEntity();
+             userCouponEntity.setAdd_time(new Date());
+             userCouponEntity.setCoupon_id(couponEntity.getId());
+             userCouponEntity.setCoupon_number(CharUtil.getRandomString(12));
+             userCouponEntity.setUser_id(loginUser.getUserId());
+
+             userCouponService.save(userCouponEntity);
+
+             return toResponseSuccess(userCouponEntity);
+         }else {
+             return toResponsFail("领取失败");
+         }
+     }
+
 
 
 }

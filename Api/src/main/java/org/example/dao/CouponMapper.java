@@ -21,7 +21,7 @@ public interface CouponMapper extends BaseDao<CouponEntity> {
     CouponEntity getUserCoupon(Integer id);
 
     /**
-     * 按类型查询
+     * 按类型查询,发放方式 0：按订单发放 1：按用户发放 2:商品转发送券 3：按商品发放 4:新用户注册 5：线下发放 6评价好评红包（固定或随机红包） 7包邮
      *
      * @param params
      * @return

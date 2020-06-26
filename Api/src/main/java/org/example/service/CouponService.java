@@ -83,7 +83,7 @@ public class CouponService{
         return couponList;
     }
     /**
-     * 查询用户最多可用优惠券
+     * 基于send_type分类查询用户可用的抵扣值最大的优惠券
      */
     public CouponEntity queryUserMaxCoupon(Map<String,Object> map){
        return couponDao.queryMaxUserEnableCoupon(map);
