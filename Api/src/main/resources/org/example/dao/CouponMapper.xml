@@ -92,4 +92,27 @@
         </choose>
     </select>
 
+    <select id="queryMaxUserEnableCoupon" resultMap="couponMap">
+        select a.id,
+        a.name,
+        a.type_money as type_money,
+        a.send_type,
+        a.min_amount,
+        a.max_amount,
+        a.send_start_date,
+        a.send_end_date,
+        a.use_start_date,
+        a.use_end_date,
+        a.min_goods_amount,
+        a.min_transmit_num
+        from shoulibu_coupon a
+        left join shoulibu_coupon b on a.send_type = b.send_type and b.type_money > a.type_money
+        where 1=1
+        and a.use_end_date >= now()
+        and now() >= a.use_start_date
+        and b.id = null
+        <if test="send_type != null">
+            and send_type = #{send_type}
+        </if>
+    </select>
 </mapper>
